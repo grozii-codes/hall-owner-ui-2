@@ -38,7 +38,26 @@ export interface Hall {
   description: string;
   bookingsThisMonth: number;
   revenueThisMonth: number;
+  photo?: string;
+  checkInTime?: string;
+  checkOutTime?: string;
+  morningSlotTime?: string;
+  nightSlotTime?: string;
+  policies?: string[];
 }
+
+export const DEFAULT_POLICIES = [
+  "Guests must arrive on time as per booking slot",
+  "Keep the hall premises clean at all times",
+  "Do not waste food — serve only required quantity",
+  "Night bookings must vacate the hall promptly next morning",
+  "No outside catering without prior permission",
+  "Loud music allowed only till 10:00 PM as per local rules",
+  "Damages to property will be charged from advance/security",
+  "Smoking and alcohol are strictly prohibited inside the hall",
+  "Decoration nails/tape must not damage walls or pillars",
+  "Parking only in designated areas",
+];
 
 export interface Review {
   id: string;
