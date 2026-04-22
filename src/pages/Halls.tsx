@@ -107,6 +107,68 @@ export default function Halls() {
           );
         })}
       </div>
+
+      {/* Add Hall — Contact Admin Dialog */}
+      <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
+        <DialogContent className="max-w-sm rounded-3xl">
+          <DialogHeader>
+            <div className="mx-auto h-14 w-14 rounded-2xl bg-primary/10 flex items-center justify-center mb-2">
+              <Building2 className="h-7 w-7 text-primary" />
+            </div>
+            <DialogTitle className="text-center font-display text-xl">Contact App Admin</DialogTitle>
+            <DialogDescription className="text-center">
+              To add a new hall to your account, please contact our admin team. They will verify your property details and onboard it within 24 hours.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-2 mt-2">
+            <a
+              href="tel:+919999999999"
+              className="flex items-center gap-3 rounded-xl bg-muted/50 hover:bg-muted px-4 py-3 transition"
+            >
+              <div className="h-10 w-10 rounded-xl bg-success/15 flex items-center justify-center">
+                <Phone className="h-4 w-4 text-success" />
+              </div>
+              <div className="flex-1">
+                <div className="text-xs text-muted-foreground">Call Admin</div>
+                <div className="text-sm font-semibold">+91 99999 99999</div>
+              </div>
+            </a>
+            <a
+              href="https://wa.me/919999999999?text=Hi,%20I%20want%20to%20add%20a%20new%20hall%20to%20my%20VenueHub%20account."
+              target="_blank"
+              rel="noreferrer"
+              className="flex items-center gap-3 rounded-xl bg-muted/50 hover:bg-muted px-4 py-3 transition"
+            >
+              <div className="h-10 w-10 rounded-xl bg-success/15 flex items-center justify-center">
+                <MessageCircle className="h-4 w-4 text-success" />
+              </div>
+              <div className="flex-1">
+                <div className="text-xs text-muted-foreground">WhatsApp</div>
+                <div className="text-sm font-semibold">+91 99999 99999</div>
+              </div>
+            </a>
+            <a
+              href="mailto:admin@venuehub.app?subject=Add%20New%20Hall%20Request"
+              className="flex items-center gap-3 rounded-xl bg-muted/50 hover:bg-muted px-4 py-3 transition"
+            >
+              <div className="h-10 w-10 rounded-xl bg-info/15 flex items-center justify-center">
+                <Mail className="h-4 w-4 text-info" />
+              </div>
+              <div className="flex-1">
+                <div className="text-xs text-muted-foreground">Email</div>
+                <div className="text-sm font-semibold">admin@venuehub.app</div>
+              </div>
+            </a>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" className="w-full rounded-xl h-11" onClick={() => setShowAddDialog(false)}>
+              Got it
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
