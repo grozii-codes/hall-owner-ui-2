@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 
 export default function Halls() {
   const [list, setList] = useState(halls);
+  const [showAddDialog, setShowAddDialog] = useState(false);
 
   const toggle = (id: string) => {
     setList((l) => l.map((h) => h.id === id ? { ...h, active: !h.active } : h));
