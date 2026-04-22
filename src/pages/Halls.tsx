@@ -1,10 +1,11 @@
 import { halls, formatINR, reviews } from "@/data/mock";
-import { Building2, Calendar, Edit, Star, MapPin, Users, Plus, TrendingUp } from "lucide-react";
+import { Building2, Calendar, Edit, Star, MapPin, Users, Plus, TrendingUp, Mail, Phone, MessageCircle } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import { toast } from "sonner";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 
 export default function Halls() {
   const [list, setList] = useState(halls);
