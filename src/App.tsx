@@ -9,6 +9,7 @@ import Bookings from "./pages/Bookings";
 import BookingDetail from "./pages/BookingDetail";
 import CalendarPage from "./pages/CalendarPage";
 import Halls from "./pages/Halls";
+import EditHall from "./pages/EditHall";
 import Customers from "./pages/Customers";
 import Analytics from "./pages/Analytics";
 import NotFound from "./pages/NotFound.tsx";
@@ -28,6 +29,7 @@ const App = () => (
             <Route path="/bookings/:id" element={<BookingDetail />} />
             <Route path="/calendar" element={<CalendarPage />} />
             <Route path="/halls" element={<Halls />} />
+            <Route path="/halls/:id/edit" element={<EditHall />} />
             <Route path="/customers" element={<Customers />} />
             <Route path="/analytics" element={<Analytics />} />
           </Route>

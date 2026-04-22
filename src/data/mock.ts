@@ -38,7 +38,26 @@ export interface Hall {
   description: string;
   bookingsThisMonth: number;
   revenueThisMonth: number;
+  photo?: string;
+  checkInTime?: string;
+  checkOutTime?: string;
+  morningSlotTime?: string;
+  nightSlotTime?: string;
+  policies?: string[];
 }
+
+export const DEFAULT_POLICIES = [
+  "Guests must arrive on time as per booking slot",
+  "Keep the hall premises clean at all times",
+  "Do not waste food — serve only required quantity",
+  "Night bookings must vacate the hall promptly next morning",
+  "No outside catering without prior permission",
+  "Loud music allowed only till 10:00 PM as per local rules",
+  "Damages to property will be charged from advance/security",
+  "Smoking and alcohol are strictly prohibited inside the hall",
+  "Decoration nails/tape must not damage walls or pillars",
+  "Parking only in designated areas",
+];
 
 export interface Review {
   id: string;
@@ -77,6 +96,17 @@ export const halls: Hall[] = [
     description: "Premium wedding hall with modern amenities and elegant interiors.",
     bookingsThisMonth: 18,
     revenueThisMonth: 720000,
+    checkInTime: "09:00 AM",
+    checkOutTime: "Next day 09:00 AM",
+    morningSlotTime: "9:00 AM – 4:00 PM",
+    nightSlotTime: "7:00 PM – 5:00 AM",
+    policies: [
+      "Guests must arrive on time as per booking slot",
+      "Keep the hall premises clean at all times",
+      "Do not waste food — serve only required quantity",
+      "Night bookings must vacate the hall by 9:00 AM next morning",
+      "Loud music allowed only till 10:00 PM",
+    ],
   },
   {
     id: "h2",
@@ -95,6 +125,15 @@ export const halls: Hall[] = [
     description: "Open-air garden lawn perfect for receptions and outdoor events.",
     bookingsThisMonth: 12,
     revenueThisMonth: 480000,
+    checkInTime: "10:00 AM",
+    checkOutTime: "Next day 08:00 AM",
+    morningSlotTime: "10:00 AM – 4:00 PM",
+    nightSlotTime: "7:00 PM – 4:00 AM",
+    policies: [
+      "Keep the lawn premises clean",
+      "Do not waste food",
+      "Vacate promptly after night booking",
+    ],
   },
 ];
 
