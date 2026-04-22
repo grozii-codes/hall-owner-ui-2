@@ -98,8 +98,8 @@ export default function Halls() {
                   <Button asChild className="rounded-xl h-11 bg-foreground text-background hover:bg-foreground/90 tap-target">
                     <Link to="/calendar"><Calendar className="h-4 w-4 mr-2" /> Calendar</Link>
                   </Button>
-                  <Button variant="outline" className="rounded-xl h-11 tap-target">
-                    <Edit className="h-4 w-4 mr-2" /> Edit Hall
+                  <Button asChild variant="outline" className="rounded-xl h-11 tap-target">
+                    <Link to={`/halls/${h.id}/edit`}><Edit className="h-4 w-4 mr-2" /> Edit Hall</Link>
                   </Button>
                 </div>
               </div>
