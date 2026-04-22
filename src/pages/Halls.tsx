@@ -23,7 +23,7 @@ export default function Halls() {
           <h2 className="font-display font-bold text-2xl lg:text-3xl">My Halls</h2>
           <p className="text-sm text-muted-foreground mt-0.5">Manage your properties, pricing, and availability</p>
         </div>
-        <Button className="rounded-full h-11 bg-primary shadow-glow tap-target">
+        <Button onClick={() => setShowAddDialog(true)} className="rounded-full h-11 bg-primary shadow-glow tap-target">
           <Plus className="h-4 w-4 mr-1" /> Add Hall
         </Button>
       </div>
