@@ -145,17 +145,35 @@ export default function Bookings() {
                       b.status === "offline" && "bg-muted text-muted-foreground",
                     )}>{b.status}</span>
                   </div>
-                  <div className="mt-1.5 text-xs text-muted-foreground truncate">
+                  <div className="mt-1.5 text-xs text-muted-foreground truncate flex items-center gap-1.5">
+                    {b.source === "online" ? <Globe className="h-3 w-3 text-info" /> : <Store className="h-3 w-3 text-muted-foreground" />}
                     <span className="font-medium text-foreground/80">{b.hallName}</span>
-                    {" • "}{format(parseISO(b.date), "d MMM yyyy")}{" • "}
+                    {" • "}{format(parseISO(b.date), "d MMM")}{" • "}
                     <span className="capitalize">{b.slot === "morning" ? "Day" : "Night"}</span>
                   </div>
                   <div className="mt-1 text-[11px] text-muted-foreground truncate flex items-center gap-1">
                     <MapPin className="h-3 w-3" /> {b.customerAddress}
                   </div>
-                  <div className="mt-2 flex items-center justify-between">
-                    <div className="font-display font-bold text-base text-primary">{formatINR(b.amount)}</div>
-                    <div className="flex items-center gap-1.5">
+                  <div className="mt-2 flex items-center justify-between gap-2">
+                    <div className="flex items-baseline gap-2 min-w-0">
+                      <span className="font-display font-bold text-base text-primary">{formatINR(b.amount)}</span>
+                      {(() => {
+                        const paid = (b.payments?.reduce((s, p) => s + p.amount, 0)) ?? b.advancePaid;
+                        const bal = b.amount - paid;
+                        const ps = paid <= 0 ? "unpaid" : bal <= 0 ? "paid" : "partial";
+                        return (
+                          <span className={cn(
+                            "chip uppercase tracking-wide text-[9px]",
+                            ps === "paid" && "bg-success-soft text-success",
+                            ps === "partial" && "bg-warning-soft text-warning",
+                            ps === "unpaid" && "bg-destructive-soft text-destructive",
+                          )}>
+                            {ps === "paid" ? "Paid" : ps === "partial" ? `Bal ${formatINR(bal)}` : "Unpaid"}
+                          </span>
+                        );
+                      })()}
+                    </div>
+                    <div className="flex items-center gap-1.5 shrink-0">
                       <a href={`tel:${b.customerPhone}`} onClick={(e) => e.stopPropagation()} className="h-7 w-7 rounded-md bg-muted flex items-center justify-center tap-target">
                         <Phone className="h-3.5 w-3.5" />
                       </a>
