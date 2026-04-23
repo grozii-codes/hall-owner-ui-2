@@ -1,8 +1,19 @@
 import { addDays, format, startOfMonth, subDays } from "date-fns";
 
 export type SlotStatus = "available" | "pending" | "confirmed" | "blocked";
-export type BookingStatus = "pending" | "confirmed" | "rejected" | "completed" | "offline";
+export type BookingStatus = "pending" | "confirmed" | "rejected" | "completed" | "offline" | "cancelled";
 export type Slot = "morning" | "night";
+export type PaymentMethod = "cash" | "upi" | "card" | "bank" | "cheque";
+export type PaymentStatus = "unpaid" | "partial" | "paid" | "refunded";
+
+export interface PaymentEntry {
+  id: string;
+  amount: number;
+  method: PaymentMethod;
+  date: string; // ISO
+  note?: string;
+  reference?: string;
+}
 
 export interface Booking {
   id: string;
@@ -19,6 +30,7 @@ export interface Booking {
   source: "online" | "offline";
   createdAt: string;
   notes?: string;
+  payments?: PaymentEntry[];
 }
 
 export interface Hall {
