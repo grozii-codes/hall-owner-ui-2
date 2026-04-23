@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
-import { halls, dayStatusFor, formatINR, bookings as allBookings } from "@/data/mock";
+import { halls, dayStatusFor, formatINR } from "@/data/mock";
 import { addMonths, eachDayOfInterval, endOfMonth, format, isSameDay, isSameMonth, parseISO, startOfMonth, startOfWeek, endOfWeek } from "date-fns";
-import { ChevronLeft, ChevronRight, X, Phone, MessageCircle } from "lucide-react";
+import { ChevronLeft, ChevronRight, X, Phone, MessageCircle, Globe, Store, Sun, Moon, ChevronRight as ChevRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -9,6 +9,7 @@ import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { Link } from "react-router-dom";
 import { toast } from "sonner";
 
 const statusColors = {
@@ -160,26 +161,42 @@ function DaySheet({ date, info, hallName, morningPrice, nightPrice, onClose }: a
           </button>
         </SheetHeader>
 
-        {/* Existing bookings */}
-        {info?.bookings.length > 0 && (
-          <div className="px-5 py-4 space-y-2 border-b">
-            <p className="text-[11px] uppercase tracking-wide text-muted-foreground font-bold">Bookings</p>
-            {info.bookings.map((b: any) => (
-              <div key={b.id} className="rounded-xl bg-muted/40 p-3 flex items-center gap-3">
-                <div className={cn(
-                  "h-2 w-2 rounded-full",
-                  b.slot === "morning" ? "bg-warning" : "bg-info"
-                )} />
-                <div className="flex-1 min-w-0">
-                  <div className="font-semibold text-sm">{b.customerName}</div>
-                  <div className="text-xs text-muted-foreground">{b.slot === "morning" ? "Day" : "Night"} • {formatINR(b.amount)} • {b.status}</div>
-                </div>
-                <a href={`tel:${b.customerPhone}`} className="h-8 w-8 rounded-full bg-primary-soft text-primary flex items-center justify-center"><Phone className="h-3.5 w-3.5" /></a>
-                <a href={`https://wa.me/${b.customerPhone.replace(/\D/g, "")}`} target="_blank" className="h-8 w-8 rounded-full bg-success-soft text-success flex items-center justify-center"><MessageCircle className="h-3.5 w-3.5" /></a>
+        {/* Existing bookings — Online vs Offline split */}
+        {info?.bookings.length > 0 && (() => {
+          const online = info.bookings.filter((b: any) => b.source === "online");
+          const offline = info.bookings.filter((b: any) => b.source === "offline");
+          return (
+            <div className="px-5 py-4 space-y-4 border-b">
+              <div className="flex items-center gap-2">
+                <p className="text-[11px] uppercase tracking-wide text-muted-foreground font-bold">Bookings on this date</p>
+                <span className="ml-auto text-[10px] font-bold px-2 py-0.5 rounded-full bg-info-soft text-info flex items-center gap-1">
+                  <Globe className="h-3 w-3" /> {online.length} Online
+                </span>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-accent-soft text-accent flex items-center gap-1">
+                  <Store className="h-3 w-3" /> {offline.length} Offline
+                </span>
               </div>
-            ))}
-          </div>
-        )}
+
+              {online.length > 0 && (
+                <div className="space-y-2">
+                  <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-wide font-bold text-info">
+                    <Globe className="h-3 w-3" /> Online Bookings
+                  </div>
+                  {online.map((b: any) => <BookingRow key={b.id} b={b} />)}
+                </div>
+              )}
+
+              {offline.length > 0 && (
+                <div className="space-y-2">
+                  <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-wide font-bold text-accent">
+                    <Store className="h-3 w-3" /> Offline Bookings
+                  </div>
+                  {offline.map((b: any) => <BookingRow key={b.id} b={b} />)}
+                </div>
+              )}
+            </div>
+          );
+        })()}
 
         <Tabs value={tab} onValueChange={setTab} className="px-5 pt-4 pb-6">
           <TabsList className="grid grid-cols-2 w-full bg-muted rounded-full h-11 p-1">
@@ -236,5 +253,67 @@ function DaySheet({ date, info, hallName, morningPrice, nightPrice, onClose }: a
         </Tabs>
       </SheetContent>
     </Sheet>
+  );
+}
+
+function BookingRow({ b }: { b: any }) {
+  const paid = (b.payments?.reduce((s: number, p: any) => s + p.amount, 0)) ?? b.advancePaid;
+  const bal = b.amount - paid;
+  const ps: "unpaid" | "partial" | "paid" = paid <= 0 ? "unpaid" : bal <= 0 ? "paid" : "partial";
+  const SlotIcon = b.slot === "morning" ? Sun : Moon;
+  return (
+    <Link
+      to={`/bookings/${b.id}`}
+      className="rounded-xl bg-card border border-border/60 p-3 flex items-center gap-3 hover:bg-muted/40 transition-colors"
+    >
+      <div className={cn(
+        "h-10 w-10 rounded-xl flex items-center justify-center shrink-0",
+        b.slot === "morning" ? "bg-warning-soft text-warning" : "bg-info-soft text-info"
+      )}>
+        <SlotIcon className="h-4 w-4" />
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-1.5 min-w-0">
+          <span className="font-semibold text-sm truncate">{b.customerName}</span>
+          <span className={cn(
+            "shrink-0 chip uppercase text-[9px] tracking-wide flex items-center gap-1",
+            b.source === "online" ? "bg-info-soft text-info" : "bg-accent-soft text-accent"
+          )}>
+            {b.source === "online" ? <Globe className="h-2.5 w-2.5" /> : <Store className="h-2.5 w-2.5" />}
+            {b.source}
+          </span>
+        </div>
+        <div className="text-[11px] text-muted-foreground mt-0.5 flex items-center gap-1.5 flex-wrap">
+          <span>{b.slot === "morning" ? "Day Slot" : "Night Slot"}</span>
+          <span>•</span>
+          <span className="font-semibold text-foreground">{formatINR(b.amount)}</span>
+          <span>•</span>
+          <span className={cn(
+            "font-semibold",
+            b.status === "confirmed" && "text-success",
+            b.status === "pending" && "text-warning",
+            b.status === "offline" && "text-accent",
+          )}>{b.status}</span>
+        </div>
+        <div className="mt-1 flex items-center gap-1.5">
+          <span className={cn(
+            "chip uppercase text-[9px] tracking-wide",
+            ps === "paid" && "bg-success-soft text-success",
+            ps === "partial" && "bg-warning-soft text-warning",
+            ps === "unpaid" && "bg-destructive-soft text-destructive",
+          )}>
+            {ps === "paid" ? "Fully Paid" : ps === "partial" ? `Bal ${formatINR(bal)}` : "Unpaid"}
+          </span>
+          <span className="text-[10px] text-muted-foreground font-mono">#{b.id}</span>
+        </div>
+      </div>
+      <a href={`tel:${b.customerPhone}`} onClick={(e) => e.stopPropagation()} className="h-8 w-8 rounded-full bg-primary-soft text-primary flex items-center justify-center shrink-0">
+        <Phone className="h-3.5 w-3.5" />
+      </a>
+      <a href={`https://wa.me/${b.customerPhone.replace(/\D/g, "")}`} target="_blank" onClick={(e) => e.stopPropagation()} className="h-8 w-8 rounded-full bg-success-soft text-success flex items-center justify-center shrink-0">
+        <MessageCircle className="h-3.5 w-3.5" />
+      </a>
+      <ChevRight className="h-4 w-4 text-muted-foreground shrink-0" />
+    </Link>
   );
 }
