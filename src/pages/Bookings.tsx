@@ -1,22 +1,27 @@
 import { useMemo, useState } from "react";
 import { bookings as allBookings, formatINR } from "@/data/mock";
-import { Search, Phone, MessageCircle, ChevronRight, Check, X, MapPin } from "lucide-react";
+import { Search, Phone, MessageCircle, ChevronRight, Check, X, MapPin, Globe, Store } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { format, parseISO } from "date-fns";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
-type Filter = "all" | "pending" | "confirmed" | "completed" | "rejected" | "offline";
+type Filter = "all" | "pending" | "confirmed" | "completed" | "rejected";
+type Source = "all" | "online" | "offline";
 
 const filters: { id: Filter; label: string }[] = [
   { id: "all", label: "All" },
   { id: "pending", label: "Pending" },
   { id: "confirmed", label: "Confirmed" },
   { id: "completed", label: "Completed" },
-  { id: "offline", label: "Offline" },
   { id: "rejected", label: "Rejected" },
+];
+
+const sources: { id: Source; label: string; icon: typeof Globe | null }[] = [
+  { id: "all", label: "Both", icon: null },
+  { id: "online", label: "Online", icon: Globe },
+  { id: "offline", label: "Offline", icon: Store },
 ];
 
 export default function Bookings() {
