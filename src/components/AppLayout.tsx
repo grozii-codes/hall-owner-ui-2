@@ -38,17 +38,17 @@ export default function AppLayout() {
   return (
     <div className="min-h-screen bg-background flex">
       {/* Desktop sidebar */}
-      <aside className="hidden lg:flex w-64 shrink-0 flex-col bg-sidebar text-sidebar-foreground border-r border-sidebar-border">
-        <div className="px-6 py-6 flex items-center gap-2.5 border-b border-sidebar-border">
-          <div className="h-9 w-9 rounded-xl bg-gradient-primary flex items-center justify-center shadow-glow">
+      <aside className="hidden lg:flex w-60 shrink-0 flex-col bg-sidebar text-sidebar-foreground border-r border-sidebar-border">
+        <div className="px-5 py-5 flex items-center gap-2.5 border-b border-sidebar-border">
+          <div className="h-9 w-9 rounded-md bg-primary flex items-center justify-center">
             <Building2 className="h-5 w-5 text-primary-foreground" />
           </div>
           <div>
-            <div className="font-display font-bold text-base">VenueHub</div>
-            <div className="text-[11px] text-sidebar-foreground/60">Owner Dashboard</div>
+            <div className="font-display font-bold text-[15px] tracking-tight">VenueHub</div>
+            <div className="text-[10px] text-sidebar-foreground/60 uppercase tracking-wider">Owner Console</div>
           </div>
         </div>
-        <nav className="flex-1 px-3 py-4 space-y-1">
+        <nav className="flex-1 px-3 py-4 space-y-0.5">
           {desktopNav.map((item) => (
             <NavLink
               key={item.to}
@@ -56,26 +56,26 @@ export default function AppLayout() {
               end={item.to === "/"}
               className={({ isActive }) =>
                 cn(
-                  "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors",
+                  "flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors",
                   isActive
-                    ? "bg-sidebar-accent text-sidebar-primary"
+                    ? "bg-sidebar-accent text-sidebar-primary-foreground"
                     : "text-sidebar-foreground/70 hover:bg-sidebar-accent/60 hover:text-sidebar-foreground"
                 )
               }
             >
-              <item.icon className="h-4.5 w-4.5" />
+              <item.icon className="h-4 w-4" />
               {item.label}
             </NavLink>
           ))}
         </nav>
         <div className="p-4 border-t border-sidebar-border">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-full bg-gradient-accent flex items-center justify-center font-display font-bold text-accent-foreground">
+            <div className="h-9 w-9 rounded-md bg-primary/20 text-primary-foreground flex items-center justify-center font-display font-bold">
               K
             </div>
             <div className="min-w-0">
               <div className="text-sm font-semibold truncate">Kareem Owner</div>
-              <div className="text-xs text-sidebar-foreground/60 truncate">+91 72193 66167</div>
+              <div className="text-[11px] text-sidebar-foreground/60 truncate">+91 72193 66167</div>
             </div>
           </div>
         </div>
@@ -84,32 +84,32 @@ export default function AppLayout() {
       {/* Main content */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Top header */}
-        <header className="sticky top-0 z-30 bg-background/85 backdrop-blur-md border-b border-border/60">
-          <div className="flex items-center justify-between px-4 lg:px-8 h-14 lg:h-16">
-            <div className="flex items-center gap-3 lg:hidden">
-              <div className="h-9 w-9 rounded-xl bg-gradient-primary flex items-center justify-center shadow-glow">
-                <Building2 className="h-5 w-5 text-primary-foreground" />
+        <header className="sticky top-0 z-30 bg-background/90 backdrop-blur-md border-b border-border">
+          <div className="flex items-center justify-between px-4 lg:px-8 h-14 lg:h-15">
+            <div className="flex items-center gap-2.5 lg:hidden">
+              <div className="h-8 w-8 rounded-md bg-primary flex items-center justify-center">
+                <Building2 className="h-4 w-4 text-primary-foreground" />
               </div>
               <div>
-                <div className="font-display font-bold text-[15px] leading-none">VenueHub</div>
-                <div className="text-[10px] text-muted-foreground mt-0.5">Owner</div>
+                <div className="font-display font-bold text-[14px] leading-none tracking-tight">VenueHub</div>
+                <div className="text-[9px] text-muted-foreground mt-0.5 uppercase tracking-wider">Owner</div>
               </div>
             </div>
-            <h1 className="hidden lg:block font-display font-bold text-xl">{title}</h1>
-            <div className="flex items-center gap-1.5">
-              <Button variant="ghost" size="icon" className="rounded-full tap-target">
-                <Search className="h-5 w-5" />
+            <h1 className="hidden lg:block font-display font-bold text-lg">{title}</h1>
+            <div className="flex items-center gap-1">
+              <Button variant="ghost" size="icon" className="rounded-md tap-target h-9 w-9">
+                <Search className="h-[18px] w-[18px]" />
               </Button>
               <Button
                 variant="ghost"
                 size="icon"
-                className="rounded-full tap-target relative"
+                className="rounded-md tap-target relative h-9 w-9"
                 onClick={() => setNotifOpen(true)}
               >
-                <Bell className="h-5 w-5" />
-                <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-destructive ring-2 ring-background" />
+                <Bell className="h-[18px] w-[18px]" />
+                <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-destructive ring-2 ring-background" />
               </Button>
-              <div className="lg:hidden ml-1 h-9 w-9 rounded-full bg-gradient-accent flex items-center justify-center font-display font-bold text-accent-foreground text-sm">
+              <div className="lg:hidden ml-1 h-8 w-8 rounded-md bg-primary text-primary-foreground flex items-center justify-center font-display font-bold text-sm">
                 K
               </div>
             </div>
