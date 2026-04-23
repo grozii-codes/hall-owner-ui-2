@@ -122,8 +122,8 @@ export default function AppLayout() {
       </div>
 
       {/* Mobile bottom nav */}
-      <nav className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-card/95 backdrop-blur-xl border-t border-border shadow-[0_-4px_20px_-4px_hsl(160_25%_12%_/_0.08)]">
-        <div className="grid grid-cols-5 max-w-lg mx-auto px-2 pt-1.5 pb-[calc(0.5rem+env(safe-area-inset-bottom))]">
+      <nav className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-card border-t border-border">
+        <div className="grid grid-cols-5 max-w-lg mx-auto px-1 pt-1.5 pb-[calc(0.5rem+env(safe-area-inset-bottom))]">
           {navItems.map((item) => (
             <NavLink
               key={item.to}
@@ -131,24 +131,18 @@ export default function AppLayout() {
               end={item.to === "/"}
               className={({ isActive }) =>
                 cn(
-                  "flex flex-col items-center gap-1 py-1.5 rounded-xl transition-colors tap-target",
+                  "flex flex-col items-center gap-0.5 py-1.5 transition-colors tap-target",
                   isActive ? "text-primary" : "text-muted-foreground"
                 )
               }
             >
               {({ isActive }) => (
                 <>
-                  <div
-                    className={cn(
-                      "h-7 w-12 rounded-full flex items-center justify-center transition-all",
-                      isActive && "bg-primary-soft"
-                    )}
-                  >
-                    <item.icon className="h-[18px] w-[18px]" strokeWidth={isActive ? 2.5 : 2} />
-                  </div>
-                  <span className={cn("text-[10px] font-semibold", isActive && "text-primary")}>
+                  <item.icon className="h-[20px] w-[20px]" strokeWidth={isActive ? 2.4 : 1.8} />
+                  <span className={cn("text-[10px] font-semibold tracking-tight", isActive && "text-primary")}>
                     {item.label}
                   </span>
+                  {isActive && <span className="h-0.5 w-6 bg-primary rounded-full mt-0.5" />}
                 </>
               )}
             </NavLink>
