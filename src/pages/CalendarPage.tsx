@@ -255,3 +255,65 @@ function DaySheet({ date, info, hallName, morningPrice, nightPrice, onClose }: a
     </Sheet>
   );
 }
+
+function BookingRow({ b }: { b: any }) {
+  const paid = (b.payments?.reduce((s: number, p: any) => s + p.amount, 0)) ?? b.advancePaid;
+  const bal = b.amount - paid;
+  const ps: "unpaid" | "partial" | "paid" = paid <= 0 ? "unpaid" : bal <= 0 ? "paid" : "partial";
+  const SlotIcon = b.slot === "morning" ? Sun : Moon;
+  return (
+    <Link
+      to={`/bookings/${b.id}`}
+      className="rounded-xl bg-card border border-border/60 p-3 flex items-center gap-3 hover:bg-muted/40 transition-colors"
+    >
+      <div className={cn(
+        "h-10 w-10 rounded-xl flex items-center justify-center shrink-0",
+        b.slot === "morning" ? "bg-warning-soft text-warning" : "bg-info-soft text-info"
+      )}>
+        <SlotIcon className="h-4 w-4" />
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-1.5 min-w-0">
+          <span className="font-semibold text-sm truncate">{b.customerName}</span>
+          <span className={cn(
+            "shrink-0 chip uppercase text-[9px] tracking-wide flex items-center gap-1",
+            b.source === "online" ? "bg-info-soft text-info" : "bg-accent-soft text-accent"
+          )}>
+            {b.source === "online" ? <Globe className="h-2.5 w-2.5" /> : <Store className="h-2.5 w-2.5" />}
+            {b.source}
+          </span>
+        </div>
+        <div className="text-[11px] text-muted-foreground mt-0.5 flex items-center gap-1.5 flex-wrap">
+          <span>{b.slot === "morning" ? "Day Slot" : "Night Slot"}</span>
+          <span>•</span>
+          <span className="font-semibold text-foreground">{formatINR(b.amount)}</span>
+          <span>•</span>
+          <span className={cn(
+            "font-semibold",
+            b.status === "confirmed" && "text-success",
+            b.status === "pending" && "text-warning",
+            b.status === "offline" && "text-accent",
+          )}>{b.status}</span>
+        </div>
+        <div className="mt-1 flex items-center gap-1.5">
+          <span className={cn(
+            "chip uppercase text-[9px] tracking-wide",
+            ps === "paid" && "bg-success-soft text-success",
+            ps === "partial" && "bg-warning-soft text-warning",
+            ps === "unpaid" && "bg-destructive-soft text-destructive",
+          )}>
+            {ps === "paid" ? "Fully Paid" : ps === "partial" ? `Bal ${formatINR(bal)}` : "Unpaid"}
+          </span>
+          <span className="text-[10px] text-muted-foreground font-mono">#{b.id}</span>
+        </div>
+      </div>
+      <a href={`tel:${b.customerPhone}`} onClick={(e) => e.stopPropagation()} className="h-8 w-8 rounded-full bg-primary-soft text-primary flex items-center justify-center shrink-0">
+        <Phone className="h-3.5 w-3.5" />
+      </a>
+      <a href={`https://wa.me/${b.customerPhone.replace(/\D/g, "")}`} target="_blank" onClick={(e) => e.stopPropagation()} className="h-8 w-8 rounded-full bg-success-soft text-success flex items-center justify-center shrink-0">
+        <MessageCircle className="h-3.5 w-3.5" />
+      </a>
+      <ChevRight className="h-4 w-4 text-muted-foreground shrink-0" />
+    </Link>
+  );
+}
