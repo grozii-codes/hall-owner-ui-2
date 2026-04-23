@@ -1,158 +1,264 @@
-import { bookings, halls, formatINR, revenueTrend } from "@/data/mock";
-import { Building2, Calendar, IndianRupee, TrendingUp, ArrowUpRight, ArrowRight, Phone, MessageCircle, Clock } from "lucide-react";
+import { useMemo, useState } from "react";
+import { bookings as allBookings, halls, formatINR } from "@/data/mock";
+import { Building2, Calendar as CalIcon, IndianRupee, ArrowRight, Phone, MessageCircle, Check, X, TrendingUp } from "lucide-react";
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis, CartesianGrid } from "recharts";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { format, parseISO } from "date-fns";
+import { format, parseISO, isToday, isWithinInterval, startOfWeek, endOfWeek, startOfMonth, endOfMonth, eachDayOfInterval } from "date-fns";
+import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
-const StatCard = ({ icon: Icon, label, value, trend, accent }: any) => (
-  <div className="stat-card">
-    <div className="flex items-start justify-between">
-      <div className={`h-10 w-10 rounded-xl flex items-center justify-center ${accent}`}>
-        <Icon className="h-5 w-5" />
-      </div>
-      {trend && (
-        <span className="chip bg-success-soft text-success">
-          <ArrowUpRight className="h-3 w-3" /> {trend}
-        </span>
-      )}
-    </div>
-    <div className="mt-3">
-      <div className="text-[11px] uppercase tracking-wide text-muted-foreground font-semibold">{label}</div>
-      <div className="text-xl font-display font-bold mt-0.5">{value}</div>
-    </div>
-  </div>
-);
+type RangeKey = "today" | "week" | "month" | "custom";
+
+const ranges: { id: RangeKey; label: string }[] = [
+  { id: "today", label: "Today" },
+  { id: "week", label: "This Week" },
+  { id: "month", label: "This Month" },
+  { id: "custom", label: "Custom" },
+];
 
 export default function Dashboard() {
-  const totalRevenue = bookings.filter(b => b.status !== "rejected").reduce((s, b) => s + b.amount, 0);
-  const monthBookings = bookings.filter(b => b.status !== "rejected").length;
-  const pending = bookings.filter(b => b.status === "pending");
-  const activeHalls = halls.filter(h => h.active).length;
-  const totalRev = revenueTrend.reduce((s, d) => s + d.revenue, 0);
+  const [range, setRange] = useState<RangeKey>("month");
+  const [customDate, setCustomDate] = useState<string>(format(new Date(), "yyyy-MM-dd"));
+
+  const { from, to, label } = useMemo(() => {
+    const today = new Date();
+    if (range === "today") return { from: today, to: today, label: format(today, "d MMM yyyy") };
+    if (range === "week") return { from: startOfWeek(today, { weekStartsOn: 1 }), to: endOfWeek(today, { weekStartsOn: 1 }), label: "This week" };
+    if (range === "month") return { from: startOfMonth(today), to: endOfMonth(today), label: format(today, "MMMM yyyy") };
+    const d = parseISO(customDate);
+    return { from: d, to: d, label: format(d, "d MMM yyyy") };
+  }, [range, customDate]);
+
+  const filtered = useMemo(() => {
+    return allBookings.filter((b) => {
+      const d = parseISO(b.date);
+      return isWithinInterval(d, { start: from, end: to });
+    });
+  }, [from, to]);
+
+  const revenue = filtered.filter((b) => b.status !== "rejected").reduce((s, b) => s + b.amount, 0);
+  const confirmedCount = filtered.filter((b) => b.status === "confirmed" || b.status === "completed").length;
+  const pending = filtered.filter((b) => b.status === "pending");
+  const activeHalls = halls.filter((h) => h.active).length;
+
+  const chartData = useMemo(() => {
+    const days = eachDayOfInterval({ start: from, end: to });
+    const limited = days.length > 14 ? days.filter((_, i) => i % Math.ceil(days.length / 14) === 0) : days;
+    return limited.map((d) => {
+      const ds = format(d, "yyyy-MM-dd");
+      const dayB = allBookings.filter((b) => b.date === ds && b.status !== "rejected");
+      return { day: format(d, days.length > 7 ? "d" : "EEE"), revenue: dayB.reduce((s, b) => s + b.amount, 0) };
+    });
+  }, [from, to]);
+
+  const handleAccept = (id: string) => toast.success(`Booking #${id} confirmed`);
+  const handleReject = (id: string) => toast.error(`Booking #${id} rejected`);
 
   return (
-    <div className="px-4 lg:px-8 py-5 lg:py-6 max-w-7xl mx-auto space-y-6">
+    <div className="px-4 lg:px-8 py-5 lg:py-6 max-w-7xl mx-auto space-y-5">
       {/* Greeting */}
-      <div className="flex items-end justify-between">
-        <div>
-          <p className="text-sm text-muted-foreground">Good morning, Kareem 👋</p>
-          <h2 className="font-display font-bold text-2xl lg:text-3xl mt-0.5">Here's today's summary</h2>
+      <div className="flex items-end justify-between gap-3">
+        <div className="min-w-0">
+          <p className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Welcome back</p>
+          <h2 className="font-display font-bold text-xl lg:text-2xl mt-1">Kareem Owner</h2>
         </div>
-        <Button asChild variant="outline" size="sm" className="hidden sm:inline-flex rounded-full">
-          <Link to="/bookings">View all <ArrowRight className="h-4 w-4 ml-1" /></Link>
-        </Button>
+        <div className="text-right shrink-0">
+          <p className="text-[11px] text-muted-foreground">{format(new Date(), "EEEE")}</p>
+          <p className="text-sm font-semibold">{format(new Date(), "d MMM yyyy")}</p>
+        </div>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
-        <StatCard icon={IndianRupee} label="Total Revenue" value={formatINR(totalRevenue)} trend="+12%" accent="bg-primary-soft text-primary" />
-        <StatCard icon={Calendar} label="Bookings" value={monthBookings} trend="+8%" accent="bg-info-soft text-info" />
-        <StatCard icon={Building2} label="Active Halls" value={activeHalls} accent="bg-accent-soft text-accent" />
-        <StatCard icon={Clock} label="Pending Action" value={pending.length} accent="bg-warning-soft text-warning" />
-      </div>
-
-      {/* Revenue chart */}
-      <div className="grid lg:grid-cols-3 gap-4">
-        <div className="lg:col-span-2 rounded-2xl bg-gradient-hero text-primary-foreground p-5 lg:p-6 shadow-elevated relative overflow-hidden">
-          <div className="absolute -right-12 -top-12 h-48 w-48 rounded-full bg-white/5 blur-2xl" />
-          <div className="relative">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs uppercase tracking-wider opacity-70 font-semibold">Revenue Trend (7 days)</p>
-                <div className="flex items-baseline gap-2 mt-1">
-                  <h3 className="font-display font-bold text-3xl lg:text-4xl">{formatINR(totalRev)}</h3>
-                  <span className="text-xs px-2 py-0.5 rounded-full bg-success/20 text-success-soft font-semibold flex items-center gap-1">
-                    <TrendingUp className="h-3 w-3" /> +18%
-                  </span>
-                </div>
-              </div>
-            </div>
-            <div className="h-44 lg:h-52 mt-5 -mx-2">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={revenueTrend}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" vertical={false} />
-                  <XAxis dataKey="day" stroke="rgba(255,255,255,0.6)" fontSize={11} tickLine={false} axisLine={false} />
-                  <YAxis hide />
-                  <Tooltip
-                    cursor={{ fill: "rgba(255,255,255,0.05)" }}
-                    contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 12, color: "hsl(var(--foreground))", fontSize: 12 }}
-                    formatter={(v: any) => [formatINR(v), "Revenue"]}
-                  />
-                  <Bar dataKey="revenue" radius={[8, 8, 0, 0]} fill="hsl(38 92% 60%)" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
+      {/* Date range filter */}
+      <div className="rounded-xl bg-card border border-border p-3 shadow-[var(--shadow-card)]">
+        <div className="flex items-center justify-between mb-2.5">
+          <div className="flex items-center gap-2">
+            <CalIcon className="h-4 w-4 text-primary" />
+            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Period</span>
+            <span className="text-sm font-semibold">{label}</span>
           </div>
         </div>
-
-        {/* Pending requests */}
-        <div className="rounded-2xl bg-card border border-border/50 p-5 shadow-card">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="font-display font-bold">Pending Requests</h3>
-            <span className="chip bg-warning-soft text-warning">{pending.length} new</span>
-          </div>
-          {pending.length === 0 ? (
-            <div className="py-10 text-center text-sm text-muted-foreground">No pending requests 🎉</div>
-          ) : (
-            <div className="space-y-2.5">
-              {pending.slice(0, 3).map((b) => (
-                <Link key={b.id} to={`/bookings/${b.id}`} className="block p-3 rounded-xl bg-muted/40 hover:bg-muted transition-colors tap-target">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="min-w-0">
-                      <div className="font-semibold text-sm truncate">{b.customerName}</div>
-                      <div className="text-xs text-muted-foreground truncate">{b.hallName} • {b.slot === "morning" ? "Day" : "Night"}</div>
-                      <div className="text-xs text-primary font-semibold mt-1">{format(parseISO(b.date), "d MMM")} • {formatINR(b.amount)}</div>
-                    </div>
-                    <ArrowRight className="h-4 w-4 text-muted-foreground shrink-0 mt-1" />
-                  </div>
-                </Link>
-              ))}
-            </div>
+        <div className="flex gap-1.5 overflow-x-auto scrollbar-hide">
+          {ranges.map((r) => (
+            <button
+              key={r.id}
+              onClick={() => setRange(r.id)}
+              className={cn(
+                "shrink-0 px-3.5 h-8 rounded-md text-xs font-semibold tap-target transition-colors",
+                range === r.id ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:text-foreground"
+              )}
+            >
+              {r.label}
+            </button>
+          ))}
+          {range === "custom" && (
+            <input
+              type="date"
+              value={customDate}
+              onChange={(e) => setCustomDate(e.target.value)}
+              className="shrink-0 h-8 rounded-md bg-muted border-0 px-2.5 text-xs font-semibold"
+            />
           )}
         </div>
       </div>
 
+      {/* Stats */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="stat-card">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] uppercase tracking-wide text-muted-foreground font-semibold">Revenue</span>
+            <IndianRupee className="h-4 w-4 text-primary" />
+          </div>
+          <div className="text-xl lg:text-2xl font-display font-bold mt-2">{formatINR(revenue)}</div>
+          <div className="text-[11px] text-success font-semibold mt-0.5 flex items-center gap-1">
+            <TrendingUp className="h-3 w-3" /> {filtered.length} bookings
+          </div>
+        </div>
+        <div className="stat-card">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] uppercase tracking-wide text-muted-foreground font-semibold">Confirmed</span>
+            <Check className="h-4 w-4 text-success" />
+          </div>
+          <div className="text-xl lg:text-2xl font-display font-bold mt-2">{confirmedCount}</div>
+          <div className="text-[11px] text-muted-foreground mt-0.5">In selected period</div>
+        </div>
+        <div className="stat-card">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] uppercase tracking-wide text-muted-foreground font-semibold">Pending</span>
+            <span className="h-2 w-2 rounded-full bg-warning animate-pulse" />
+          </div>
+          <div className="text-xl lg:text-2xl font-display font-bold mt-2">{pending.length}</div>
+          <div className="text-[11px] text-warning font-semibold mt-0.5">Need action</div>
+        </div>
+        <div className="stat-card">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] uppercase tracking-wide text-muted-foreground font-semibold">Active Halls</span>
+            <Building2 className="h-4 w-4 text-primary" />
+          </div>
+          <div className="text-xl lg:text-2xl font-display font-bold mt-2">{activeHalls}</div>
+          <div className="text-[11px] text-muted-foreground mt-0.5">of {halls.length} total</div>
+        </div>
+      </div>
+
+      {/* Pending action — most important */}
+      {pending.length > 0 && (
+        <div className="rounded-xl bg-card border border-warning/30 shadow-[var(--shadow-card)] overflow-hidden">
+          <div className="px-4 py-3 flex items-center justify-between bg-warning-soft/40 border-b border-warning/20">
+            <div className="flex items-center gap-2">
+              <span className="h-2 w-2 rounded-full bg-warning" />
+              <h3 className="font-display font-bold text-sm">Pending Approval</h3>
+              <span className="chip bg-warning text-warning-foreground">{pending.length}</span>
+            </div>
+            <Link to="/bookings" className="text-xs text-primary font-semibold flex items-center gap-1">
+              All <ArrowRight className="h-3 w-3" />
+            </Link>
+          </div>
+          <div className="divide-y divide-border">
+            {pending.slice(0, 4).map((b) => (
+              <div key={b.id} className="p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <Link to={`/bookings/${b.id}`} className="flex-1 min-w-0">
+                    <div className="font-semibold text-sm truncate">{b.customerName}</div>
+                    <div className="text-xs text-muted-foreground mt-0.5 truncate">
+                      {b.hallName} • {format(parseISO(b.date), "d MMM")} • {b.slot === "morning" ? "Day" : "Night"}
+                    </div>
+                    <div className="text-xs text-foreground/70 mt-1 truncate">📍 {b.customerAddress}</div>
+                    <div className="flex items-center gap-3 mt-1.5">
+                      <span className="text-sm font-display font-bold text-primary">{formatINR(b.amount)}</span>
+                      <span className="text-[11px] text-muted-foreground font-mono">#{b.id}</span>
+                    </div>
+                  </Link>
+                  <div className="flex flex-col gap-1.5 shrink-0">
+                    <a href={`tel:${b.customerPhone}`} className="h-8 w-8 rounded-md bg-muted flex items-center justify-center tap-target">
+                      <Phone className="h-3.5 w-3.5" />
+                    </a>
+                    <a href={`https://wa.me/${b.customerPhone.replace(/\D/g, "")}`} target="_blank" className="h-8 w-8 rounded-md bg-success-soft text-success flex items-center justify-center tap-target">
+                      <MessageCircle className="h-3.5 w-3.5" />
+                    </a>
+                  </div>
+                </div>
+                <div className="flex gap-2 mt-3">
+                  <Button onClick={() => handleAccept(b.id)} size="sm" className="flex-1 h-9 bg-success hover:bg-success/90 text-white rounded-md">
+                    <Check className="h-4 w-4 mr-1" /> Accept
+                  </Button>
+                  <Button onClick={() => handleReject(b.id)} size="sm" variant="outline" className="flex-1 h-9 rounded-md border-destructive/30 text-destructive hover:bg-destructive-soft">
+                    <X className="h-4 w-4 mr-1" /> Reject
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Revenue chart */}
+      <div className="rounded-xl bg-card border border-border shadow-[var(--shadow-card)] p-4 lg:p-5">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h3 className="font-display font-bold text-sm">Revenue Overview</h3>
+            <p className="text-[11px] text-muted-foreground mt-0.5">{label}</p>
+          </div>
+          <div className="text-right">
+            <div className="font-display font-bold text-lg">{formatINR(revenue)}</div>
+          </div>
+        </div>
+        <div className="h-44">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={chartData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+              <XAxis dataKey="day" stroke="hsl(var(--muted-foreground))" fontSize={10} tickLine={false} axisLine={false} />
+              <YAxis hide />
+              <Tooltip
+                cursor={{ fill: "hsl(var(--muted))" }}
+                contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, fontSize: 12 }}
+                formatter={(v: any) => [formatINR(v), "Revenue"]}
+              />
+              <Bar dataKey="revenue" radius={[4, 4, 0, 0]} fill="hsl(var(--primary))" />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
       {/* Recent bookings */}
-      <div className="rounded-2xl bg-card border border-border/50 shadow-card overflow-hidden">
-        <div className="px-5 py-4 flex items-center justify-between border-b border-border/50">
-          <h3 className="font-display font-bold">Recent Bookings</h3>
+      <div className="rounded-xl bg-card border border-border shadow-[var(--shadow-card)] overflow-hidden">
+        <div className="px-4 py-3 flex items-center justify-between border-b border-border">
+          <h3 className="font-display font-bold text-sm">Recent Bookings</h3>
           <Link to="/bookings" className="text-xs text-primary font-semibold flex items-center gap-1">
             View all <ArrowRight className="h-3 w-3" />
           </Link>
         </div>
-        <div className="divide-y divide-border/50">
-          {bookings.slice(0, 5).map((b) => (
-            <Link key={b.id} to={`/bookings/${b.id}`} className="flex items-center gap-3 px-5 py-3.5 hover:bg-muted/30 transition-colors">
-              <div className={`h-10 w-10 rounded-full flex items-center justify-center font-display font-bold text-sm shrink-0 ${
-                b.status === "confirmed" ? "bg-success-soft text-success" :
-                b.status === "pending" ? "bg-warning-soft text-warning" :
-                "bg-muted text-muted-foreground"
-              }`}>
+        <div className="divide-y divide-border">
+          {filtered.slice(0, 6).map((b) => (
+            <Link key={b.id} to={`/bookings/${b.id}`} className="flex items-center gap-3 px-4 py-3 hover:bg-muted/40 transition-colors">
+              <div className={cn(
+                "h-9 w-9 rounded-md flex items-center justify-center font-display font-bold text-xs shrink-0",
+                b.status === "confirmed" && "bg-success-soft text-success",
+                b.status === "pending" && "bg-warning-soft text-warning",
+                b.status === "completed" && "bg-info-soft text-info",
+                b.status === "rejected" && "bg-destructive-soft text-destructive",
+                b.status === "offline" && "bg-muted text-muted-foreground",
+              )}>
                 {b.customerName.charAt(0)}
               </div>
               <div className="flex-1 min-w-0">
                 <div className="font-semibold text-sm truncate">{b.customerName}</div>
-                <div className="text-xs text-muted-foreground truncate">{b.hallName} • {format(parseISO(b.date), "d MMM")} • {b.slot === "morning" ? "Day" : "Night"}</div>
+                <div className="text-[11px] text-muted-foreground truncate">{b.hallName} • {format(parseISO(b.date), "d MMM")} • {b.slot === "morning" ? "Day" : "Night"}</div>
               </div>
               <div className="text-right shrink-0">
                 <div className="font-display font-bold text-sm">{formatINR(b.amount)}</div>
-                <div className={`text-[10px] uppercase font-bold tracking-wide ${
-                  b.status === "confirmed" ? "text-success" :
-                  b.status === "pending" ? "text-warning" :
-                  "text-muted-foreground"
-                }`}>{b.status}</div>
-              </div>
-              <div className="hidden sm:flex gap-1 ml-2">
-                <a href={`tel:${b.customerPhone}`} onClick={(e) => e.stopPropagation()} className="h-8 w-8 rounded-full bg-primary-soft text-primary flex items-center justify-center tap-target">
-                  <Phone className="h-3.5 w-3.5" />
-                </a>
-                <a href={`https://wa.me/${b.customerPhone.replace(/\D/g, "")}`} target="_blank" onClick={(e) => e.stopPropagation()} className="h-8 w-8 rounded-full bg-success-soft text-success flex items-center justify-center tap-target">
-                  <MessageCircle className="h-3.5 w-3.5" />
-                </a>
+                <div className={cn(
+                  "text-[10px] uppercase font-bold tracking-wide",
+                  b.status === "confirmed" && "text-success",
+                  b.status === "pending" && "text-warning",
+                  b.status === "completed" && "text-info",
+                  b.status === "rejected" && "text-destructive",
+                )}>{b.status}</div>
               </div>
             </Link>
           ))}
+          {filtered.length === 0 && (
+            <div className="py-10 text-center text-sm text-muted-foreground">No bookings in this period</div>
+          )}
         </div>
       </div>
     </div>
