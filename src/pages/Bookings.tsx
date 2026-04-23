@@ -1,33 +1,39 @@
 import { useMemo, useState } from "react";
 import { bookings as allBookings, formatINR } from "@/data/mock";
-import { Search, Phone, MessageCircle, ChevronRight, Check, X, MapPin } from "lucide-react";
+import { Search, Phone, MessageCircle, ChevronRight, Check, X, MapPin, Globe, Store } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { format, parseISO } from "date-fns";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
-type Filter = "all" | "pending" | "confirmed" | "completed" | "rejected" | "offline";
+type Filter = "all" | "pending" | "confirmed" | "completed" | "rejected";
+type Source = "all" | "online" | "offline";
 
 const filters: { id: Filter; label: string }[] = [
   { id: "all", label: "All" },
   { id: "pending", label: "Pending" },
   { id: "confirmed", label: "Confirmed" },
   { id: "completed", label: "Completed" },
-  { id: "offline", label: "Offline" },
   { id: "rejected", label: "Rejected" },
+];
+
+const sources: { id: Source; label: string; icon: typeof Globe | null }[] = [
+  { id: "all", label: "Both", icon: null },
+  { id: "online", label: "Online", icon: Globe },
+  { id: "offline", label: "Offline", icon: Store },
 ];
 
 export default function Bookings() {
   const [filter, setFilter] = useState<Filter>("all");
+  const [source, setSource] = useState<Source>("all");
   const [q, setQ] = useState("");
   const [date, setDate] = useState("");
 
   const list = useMemo(() => {
     return allBookings.filter((b) => {
-      if (filter === "offline" && b.source !== "offline") return false;
-      if (filter !== "all" && filter !== "offline" && b.status !== filter) return false;
+      if (filter !== "all" && b.status !== filter) return false;
+      if (source !== "all" && b.source !== source) return false;
       if (date && b.date !== date) return false;
       if (q) {
         const s = q.toLowerCase();
@@ -35,7 +41,7 @@ export default function Bookings() {
       }
       return true;
     });
-  }, [filter, q, date]);
+  }, [filter, source, q, date]);
 
   return (
     <div className="px-4 lg:px-8 py-5 lg:py-6 max-w-5xl mx-auto space-y-4">
@@ -63,7 +69,29 @@ export default function Bookings() {
         />
       </div>
 
-      {/* Filter chips */}
+      {/* Source toggle: Both / Online / Offline */}
+      <div className="inline-flex p-1 rounded-full bg-muted border border-border/60 w-full sm:w-auto">
+        {sources.map((s) => {
+          const Icon = s.icon;
+          return (
+            <button
+              key={s.id}
+              onClick={() => setSource(s.id)}
+              className={cn(
+                "flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 h-9 rounded-full text-xs font-semibold tap-target transition-all",
+                source === s.id
+                  ? "bg-card text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              {Icon && <Icon className="h-3.5 w-3.5" />}
+              {s.label}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Status filter chips */}
       <div className="flex gap-2 overflow-x-auto scrollbar-hide -mx-4 lg:mx-0 px-4 lg:px-0 pb-1">
         {filters.map((f) => (
           <button
@@ -117,17 +145,35 @@ export default function Bookings() {
                       b.status === "offline" && "bg-muted text-muted-foreground",
                     )}>{b.status}</span>
                   </div>
-                  <div className="mt-1.5 text-xs text-muted-foreground truncate">
+                  <div className="mt-1.5 text-xs text-muted-foreground truncate flex items-center gap-1.5">
+                    {b.source === "online" ? <Globe className="h-3 w-3 text-info" /> : <Store className="h-3 w-3 text-muted-foreground" />}
                     <span className="font-medium text-foreground/80">{b.hallName}</span>
-                    {" • "}{format(parseISO(b.date), "d MMM yyyy")}{" • "}
+                    {" • "}{format(parseISO(b.date), "d MMM")}{" • "}
                     <span className="capitalize">{b.slot === "morning" ? "Day" : "Night"}</span>
                   </div>
                   <div className="mt-1 text-[11px] text-muted-foreground truncate flex items-center gap-1">
                     <MapPin className="h-3 w-3" /> {b.customerAddress}
                   </div>
-                  <div className="mt-2 flex items-center justify-between">
-                    <div className="font-display font-bold text-base text-primary">{formatINR(b.amount)}</div>
-                    <div className="flex items-center gap-1.5">
+                  <div className="mt-2 flex items-center justify-between gap-2">
+                    <div className="flex items-baseline gap-2 min-w-0">
+                      <span className="font-display font-bold text-base text-primary">{formatINR(b.amount)}</span>
+                      {(() => {
+                        const paid = (b.payments?.reduce((s, p) => s + p.amount, 0)) ?? b.advancePaid;
+                        const bal = b.amount - paid;
+                        const ps = paid <= 0 ? "unpaid" : bal <= 0 ? "paid" : "partial";
+                        return (
+                          <span className={cn(
+                            "chip uppercase tracking-wide text-[9px]",
+                            ps === "paid" && "bg-success-soft text-success",
+                            ps === "partial" && "bg-warning-soft text-warning",
+                            ps === "unpaid" && "bg-destructive-soft text-destructive",
+                          )}>
+                            {ps === "paid" ? "Paid" : ps === "partial" ? `Bal ${formatINR(bal)}` : "Unpaid"}
+                          </span>
+                        );
+                      })()}
+                    </div>
+                    <div className="flex items-center gap-1.5 shrink-0">
                       <a href={`tel:${b.customerPhone}`} onClick={(e) => e.stopPropagation()} className="h-7 w-7 rounded-md bg-muted flex items-center justify-center tap-target">
                         <Phone className="h-3.5 w-3.5" />
                       </a>
