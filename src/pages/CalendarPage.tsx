@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
-import { halls, dayStatusFor, formatINR, bookings as allBookings } from "@/data/mock";
+import { halls, dayStatusFor, formatINR } from "@/data/mock";
 import { addMonths, eachDayOfInterval, endOfMonth, format, isSameDay, isSameMonth, parseISO, startOfMonth, startOfWeek, endOfWeek } from "date-fns";
-import { ChevronLeft, ChevronRight, X, Phone, MessageCircle, Globe, Store, ChevronRight as ChevRight, Sun, Moon } from "lucide-react";
+import { ChevronLeft, ChevronRight, X, Phone, MessageCircle, Globe, Store, Sun, Moon, ChevronRight as ChevRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
