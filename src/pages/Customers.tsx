@@ -15,6 +15,7 @@ const statusStyles: Record<Booking["status"], string> = {
   completed: "bg-muted text-muted-foreground border-border",
   rejected: "bg-destructive/10 text-destructive border-destructive/30",
   offline: "bg-secondary text-secondary-foreground border-border",
+  cancelled: "bg-destructive/10 text-destructive border-destructive/30",
 };
 
 export default function Customers() {
