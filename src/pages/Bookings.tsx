@@ -26,13 +26,14 @@ const sources: { id: Source; label: string; icon: typeof Globe | null }[] = [
 
 export default function Bookings() {
   const [filter, setFilter] = useState<Filter>("all");
+  const [source, setSource] = useState<Source>("all");
   const [q, setQ] = useState("");
   const [date, setDate] = useState("");
 
   const list = useMemo(() => {
     return allBookings.filter((b) => {
-      if (filter === "offline" && b.source !== "offline") return false;
-      if (filter !== "all" && filter !== "offline" && b.status !== filter) return false;
+      if (filter !== "all" && b.status !== filter) return false;
+      if (source !== "all" && b.source !== source) return false;
       if (date && b.date !== date) return false;
       if (q) {
         const s = q.toLowerCase();
@@ -40,7 +41,7 @@ export default function Bookings() {
       }
       return true;
     });
-  }, [filter, q, date]);
+  }, [filter, source, q, date]);
 
   return (
     <div className="px-4 lg:px-8 py-5 lg:py-6 max-w-5xl mx-auto space-y-4">
@@ -68,7 +69,29 @@ export default function Bookings() {
         />
       </div>
 
-      {/* Filter chips */}
+      {/* Source toggle: Both / Online / Offline */}
+      <div className="inline-flex p-1 rounded-full bg-muted border border-border/60 w-full sm:w-auto">
+        {sources.map((s) => {
+          const Icon = s.icon;
+          return (
+            <button
+              key={s.id}
+              onClick={() => setSource(s.id)}
+              className={cn(
+                "flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 h-9 rounded-full text-xs font-semibold tap-target transition-all",
+                source === s.id
+                  ? "bg-card text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              {Icon && <Icon className="h-3.5 w-3.5" />}
+              {s.label}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Status filter chips */}
       <div className="flex gap-2 overflow-x-auto scrollbar-hide -mx-4 lg:mx-0 px-4 lg:px-0 pb-1">
         {filters.map((f) => (
           <button
