@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700;9..144,800&family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&family=Inter:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -8,52 +8,52 @@
 
 @layer base {
   :root {
-    /* Surfaces — soft cream/off-white like customer app */
-    --background: 30 25% 97%;
-    --foreground: 220 35% 14%;
+    /* Surfaces — clean neutral, business-grade */
+    --background: 220 20% 98%;
+    --foreground: 220 30% 12%;
 
     --card: 0 0% 100%;
-    --card-foreground: 220 35% 14%;
+    --card-foreground: 220 30% 12%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 220 35% 14%;
+    --popover-foreground: 220 30% 12%;
 
-    /* Brand — deep navy (matches BookMyHall header/Login button) */
-    --primary: 220 55% 18%;
-    --primary-foreground: 30 25% 97%;
-    --primary-glow: 220 50% 28%;
-    --primary-soft: 220 35% 94%;
+    /* Brand — corporate navy */
+    --primary: 218 52% 20%;
+    --primary-foreground: 220 20% 98%;
+    --primary-glow: 218 48% 28%;
+    --primary-soft: 218 30% 94%;
 
-    --secondary: 30 20% 94%;
-    --secondary-foreground: 220 35% 14%;
+    --secondary: 220 14% 95%;
+    --secondary-foreground: 220 30% 12%;
 
-    --muted: 30 18% 94%;
-    --muted-foreground: 220 12% 42%;
+    --muted: 220 14% 95%;
+    --muted-foreground: 220 10% 42%;
 
-    /* Accent — warm amber/gold (matches Search button + dot) */
-    --accent: 35 88% 52%;
-    --accent-foreground: 220 35% 14%;
-    --accent-soft: 35 90% 94%;
+    /* Accent — restrained gold */
+    --accent: 38 78% 48%;
+    --accent-foreground: 0 0% 100%;
+    --accent-soft: 38 82% 94%;
 
-    --destructive: 358 72% 52%;
+    --destructive: 0 65% 48%;
     --destructive-foreground: 0 0% 100%;
-    --destructive-soft: 358 80% 96%;
+    --destructive-soft: 0 75% 96%;
 
-    --success: 152 55% 36%;
+    --success: 152 48% 34%;
     --success-foreground: 0 0% 100%;
-    --success-soft: 152 50% 93%;
+    --success-soft: 152 40% 94%;
 
-    --warning: 35 88% 52%;
-    --warning-soft: 35 90% 94%;
+    --warning: 32 82% 46%;
+    --warning-soft: 32 85% 95%;
 
-    --info: 220 70% 50%;
-    --info-soft: 220 80% 95%;
+    --info: 215 65% 44%;
+    --info-soft: 215 70% 95%;
 
-    --border: 220 15% 88%;
-    --input: 220 15% 88%;
-    --ring: 220 55% 18%;
+    --border: 220 14% 88%;
+    --input: 220 14% 88%;
+    --ring: 218 52% 20%;
 
-    --radius: 0.875rem;
+    --radius: 0.5rem;
 
     /* Gradients — refined */
     --gradient-primary: linear-gradient(135deg, hsl(220 55% 18%), hsl(220 50% 28%));
@@ -102,24 +102,24 @@
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
   h1, h2, h3, h4 {
-    font-family: 'Fraunces', Georgia, serif;
+    font-family: 'Source Serif 4', 'Georgia', serif;
     font-optical-sizing: auto;
     letter-spacing: -0.015em;
-    font-weight: 600;
+    font-weight: 700;
   }
 }
 
 @layer components {
   .stat-card {
-    @apply rounded-2xl bg-card p-4 shadow-[var(--shadow-card)] border border-border transition-[var(--transition-base)];
+    @apply rounded-lg bg-card p-4 shadow-[var(--shadow-card)] border border-border transition-[var(--transition-base)];
   }
   .chip {
-    @apply inline-flex items-center gap-1.5 rounded-md px-2 py-0.5 text-[11px] font-semibold;
+    @apply inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide;
   }
   .tap-target {
     @apply active:scale-[0.98] transition-transform touch-manipulation;
   }
   .scrollbar-hide::-webkit-scrollbar { display: none; }
   .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
-  .font-serif-display { font-family: 'Fraunces', Georgia, serif; }
+  .font-serif-display { font-family: 'Source Serif 4', Georgia, serif; font-weight: 700; }
 }

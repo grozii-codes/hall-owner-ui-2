@@ -115,8 +115,8 @@ export default {
         "gradient-hero": "var(--gradient-hero)",
       },
       fontFamily: {
-        display: ['Fraunces', 'Georgia', 'serif'],
-        serif: ['Fraunces', 'Georgia', 'serif'],
+        display: ['Source Serif 4', 'Georgia', 'serif'],
+        serif: ['Source Serif 4', 'Georgia', 'serif'],
         sans: ['Inter', 'system-ui', 'sans-serif'],
       },
     },
