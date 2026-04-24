@@ -14,12 +14,12 @@ const filters: { id: Filter; label: string }[] = [
   { id: "all", label: "All" },
   { id: "pending", label: "Pending" },
   { id: "confirmed", label: "Confirmed" },
-  { id: "completed", label: "Completed" },
+  { id: "completed", label: "Done" },
   { id: "rejected", label: "Rejected" },
 ];
 
 const sources: { id: Source; label: string; icon: typeof Globe | null }[] = [
-  { id: "all", label: "Both", icon: null },
+  { id: "all", label: "All", icon: null },
   { id: "online", label: "Online", icon: Globe },
   { id: "offline", label: "Offline", icon: Store },
 ];
