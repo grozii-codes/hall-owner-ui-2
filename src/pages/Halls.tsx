@@ -135,7 +135,7 @@ export default function Halls() {
               </div>
             </a>
             <a
-              href="https://wa.me/919999999999?text=Hi,%20I%20want%20to%20add%20a%20new%20hall%20to%20my%20VenueHub%20account."
+              href="https://wa.me/919999999999?text=Hi,%20I%20want%20to%20add%20a%20new%20hall%20to%20my%20BookMyHall%20account."
               target="_blank"
               rel="noreferrer"
               className="flex items-center gap-3 rounded-xl bg-muted/50 hover:bg-muted px-4 py-3 transition"
