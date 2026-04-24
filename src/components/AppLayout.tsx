@@ -52,10 +52,10 @@ export default function AppLayout() {
         {/* Brand */}
         <div className="px-5 py-5 border-b border-sidebar-border">
           <div className="flex items-center gap-2.5">
-            <div className="h-9 w-9 rounded-lg bg-accent flex items-center justify-center">
+            <div className="h-9 w-9 rounded-md bg-accent flex items-center justify-center">
               <Building2 className="h-5 w-5 text-accent-foreground" />
             </div>
-            <span className="font-serif-display font-bold text-[17px] text-primary-foreground">BookMyHall</span>
+            <span className="font-serif-display text-[17px] text-primary-foreground">BookMyHall</span>
           </div>
         </div>
 
@@ -119,15 +119,15 @@ export default function AppLayout() {
         <header className="sticky top-0 z-30 bg-background/95 backdrop-blur-md border-b border-border">
           <div className="flex items-center justify-between px-4 lg:px-8 h-15 lg:h-16">
             <div className="flex items-center gap-2.5 lg:hidden min-w-0">
-              <div className="h-9 w-9 rounded-lg bg-primary flex items-center justify-center shrink-0">
+              <div className="h-9 w-9 rounded-md bg-primary flex items-center justify-center shrink-0">
                 <Building2 className="h-4 w-4 text-primary-foreground" />
               </div>
               <div className="min-w-0">
-                <div className="font-serif-display font-bold text-[15px] leading-tight truncate">{primaryHall.name}</div>
+                <div className="font-serif-display text-[15px] leading-tight truncate">{primaryHall.name}</div>
                 <div className="text-[10px] text-muted-foreground leading-tight truncate">Owner Console</div>
               </div>
             </div>
-            <h1 className="hidden lg:block font-serif-display font-bold text-xl">{title}</h1>
+            <h1 className="hidden lg:block font-serif-display text-xl">{title}</h1>
             <div className="flex items-center gap-1">
               <Button
                 variant="ghost"
