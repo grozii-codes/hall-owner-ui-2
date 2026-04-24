@@ -79,7 +79,7 @@ export default function CalendarPage() {
           ))}
         </div>
 
-        <div className="grid grid-cols-7 gap-1 px-1 lg:px-2 pb-2">
+        <div className="grid grid-cols-7 gap-1 px-1.5 lg:px-2 pb-2">
           {days.map((d) => {
             const ds = format(d, "yyyy-MM-dd");
             const info = dayStatusFor(ds, hallId);
@@ -92,16 +92,17 @@ export default function CalendarPage() {
                 onClick={() => info.status !== "past" && setSelected(ds)}
                 disabled={info.status === "past"}
                 className={cn(
-                  "aspect-square lg:aspect-auto lg:min-h-[78px] rounded-xl p-1 lg:p-2 flex flex-col text-left transition-all tap-target",
-                  isOtherMonth && "opacity-30",
+                  "min-h-[58px] lg:min-h-[80px] rounded-lg p-1 lg:p-2 flex flex-col items-stretch text-left transition-all tap-target border",
+                  isOtherMonth ? "opacity-30 border-transparent" : "border-transparent",
                   info.status === "past" && "cursor-not-allowed opacity-50",
+                  info.status !== "past" && info.status !== "available" && "border-border/40",
                   info.status !== "past" && "hover:bg-muted/60",
                   isToday && "ring-2 ring-primary"
                 )}
               >
-                <div className="flex items-start justify-between">
+                <div className="flex items-center justify-between gap-0.5">
                   <span className={cn(
-                    "text-xs lg:text-sm font-bold",
+                    "text-[13px] lg:text-sm font-bold",
                     isToday && "h-6 w-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs"
                   )}>{format(d, "d")}</span>
                   {info.status !== "past" && info.status !== "available" && (
@@ -109,7 +110,7 @@ export default function CalendarPage() {
                   )}
                 </div>
                 {info.status !== "past" && info.status !== "available" && (
-                  <div className={cn("mt-auto text-[9px] lg:text-[10px] font-bold rounded-md px-1 py-0.5 text-center", colors.chip)}>
+                  <div className={cn("mt-auto text-[8px] lg:text-[10px] font-bold rounded-md px-0.5 py-0.5 text-center leading-tight", colors.chip)}>
                     {colors.label}
                   </div>
                 )}
