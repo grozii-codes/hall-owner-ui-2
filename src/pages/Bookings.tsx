@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { bookings as allBookings, formatINR } from "@/data/mock";
-import { Search, Phone, MessageCircle, ChevronRight, Check, X, MapPin, Globe, Store } from "lucide-react";
+import { Search, Phone, MessageCircle, ChevronRight, Check, X, MapPin, Globe, Store, Calendar as CalIcon } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { format, parseISO } from "date-fns";
 import { Link } from "react-router-dom";
@@ -14,12 +14,12 @@ const filters: { id: Filter; label: string }[] = [
   { id: "all", label: "All" },
   { id: "pending", label: "Pending" },
   { id: "confirmed", label: "Confirmed" },
-  { id: "completed", label: "Completed" },
+  { id: "completed", label: "Done" },
   { id: "rejected", label: "Rejected" },
 ];
 
 const sources: { id: Source; label: string; icon: typeof Globe | null }[] = [
-  { id: "all", label: "Both", icon: null },
+  { id: "all", label: "All", icon: null },
   { id: "online", label: "Online", icon: Globe },
   { id: "offline", label: "Offline", icon: Store },
 ];
@@ -43,70 +43,99 @@ export default function Bookings() {
     });
   }, [filter, source, q, date]);
 
+  const counts = useMemo(() => ({
+    all: allBookings.length,
+    pending: allBookings.filter((b) => b.status === "pending").length,
+    confirmed: allBookings.filter((b) => b.status === "confirmed").length,
+    completed: allBookings.filter((b) => b.status === "completed").length,
+    rejected: allBookings.filter((b) => b.status === "rejected").length,
+  }), []);
+
   return (
     <div className="px-4 lg:px-8 py-5 lg:py-6 max-w-5xl mx-auto space-y-4">
       <div>
-        <h2 className="font-display font-bold text-2xl lg:text-3xl">Bookings</h2>
-        <p className="text-sm text-muted-foreground mt-0.5">Manage and respond to all booking requests</p>
+        <h2 className="font-serif-display font-bold text-2xl lg:text-3xl">Bookings</h2>
+        <p className="text-sm text-muted-foreground mt-0.5">Tap any booking to view details, accept, or collect payment</p>
       </div>
 
-      {/* Search + date */}
-      <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-2.5">
-        <div className="relative">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            placeholder="Search by name, ID, hall or phone..."
-            className="pl-10 h-12 rounded-2xl bg-card border-border/60"
-          />
-        </div>
+      {/* Search */}
+      <div className="relative">
+        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Input
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          placeholder="Search by customer, phone or booking ID..."
+          className="pl-10 h-12 rounded-xl bg-card border-border"
+        />
+      </div>
+
+      {/* Date filter — labeled, mobile-friendly */}
+      <div className="flex items-center gap-2 rounded-xl bg-card border border-border px-3 h-12">
+        <CalIcon className="h-4 w-4 text-primary shrink-0" />
+        <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide shrink-0">Date</span>
         <input
           type="date"
           value={date}
           onChange={(e) => setDate(e.target.value)}
-          className="h-12 rounded-2xl bg-card border border-border/60 px-4 text-sm"
+          className="flex-1 bg-transparent text-sm font-semibold outline-none min-w-0"
         />
+        {date && (
+          <button onClick={() => setDate("")} className="text-xs font-semibold text-destructive shrink-0 px-2 py-1 rounded-md hover:bg-destructive-soft">
+            Clear
+          </button>
+        )}
       </div>
 
-      {/* Source toggle: Both / Online / Offline */}
-      <div className="inline-flex p-1 rounded-full bg-muted border border-border/60 w-full sm:w-auto">
-        {sources.map((s) => {
-          const Icon = s.icon;
-          return (
+      {/* Source toggle */}
+      <div>
+        <div className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground mb-1.5">Source</div>
+        <div className="inline-flex p-1 rounded-full bg-muted border border-border w-full">
+          {sources.map((s) => {
+            const Icon = s.icon;
+            return (
+              <button
+                key={s.id}
+                onClick={() => setSource(s.id)}
+                className={cn(
+                  "flex-1 flex items-center justify-center gap-1.5 px-4 h-9 rounded-full text-xs font-semibold tap-target transition-all",
+                  source === s.id
+                    ? "bg-card text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                {Icon && <Icon className="h-3.5 w-3.5" />}
+                {s.label}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Status filter chips with counts */}
+      <div>
+        <div className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground mb-1.5">Status</div>
+        <div className="flex gap-2 overflow-x-auto scrollbar-hide -mx-4 lg:mx-0 px-4 lg:px-0 pb-1">
+          {filters.map((f) => (
             <button
-              key={s.id}
-              onClick={() => setSource(s.id)}
+              key={f.id}
+              onClick={() => setFilter(f.id)}
               className={cn(
-                "flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 h-9 rounded-full text-xs font-semibold tap-target transition-all",
-                source === s.id
-                  ? "bg-card text-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
+                "shrink-0 flex items-center gap-2 px-4 h-10 rounded-full text-sm font-semibold tap-target transition-colors",
+                filter === f.id
+                  ? "bg-primary text-primary-foreground shadow-glow"
+                  : "bg-card text-muted-foreground border border-border hover:text-foreground"
               )}
             >
-              {Icon && <Icon className="h-3.5 w-3.5" />}
-              {s.label}
+              {f.label}
+              <span className={cn(
+                "rounded-full px-1.5 text-[10px] font-bold min-w-5 text-center",
+                filter === f.id ? "bg-primary-foreground/20" : "bg-muted"
+              )}>
+                {counts[f.id]}
+              </span>
             </button>
-          );
-        })}
-      </div>
-
-      {/* Status filter chips */}
-      <div className="flex gap-2 overflow-x-auto scrollbar-hide -mx-4 lg:mx-0 px-4 lg:px-0 pb-1">
-        {filters.map((f) => (
-          <button
-            key={f.id}
-            onClick={() => setFilter(f.id)}
-            className={cn(
-              "shrink-0 px-4 h-9 rounded-full text-sm font-semibold tap-target transition-colors",
-              filter === f.id
-                ? "bg-primary text-primary-foreground shadow-glow"
-                : "bg-card text-muted-foreground border border-border/60 hover:text-foreground"
-            )}
-          >
-            {f.label}
-          </button>
-        ))}
+          ))}
+        </div>
       </div>
 
       {/* List */}

@@ -10,8 +10,9 @@ import BookingDetail from "./pages/BookingDetail";
 import CalendarPage from "./pages/CalendarPage";
 import Halls from "./pages/Halls";
 import EditHall from "./pages/EditHall";
-import Customers from "./pages/Customers";
+import OfflineBookings from "./pages/OfflineBookings";
 import Analytics from "./pages/Analytics";
+import Login from "./pages/Login";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -23,6 +24,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
+          <Route path="/login" element={<Login />} />
           <Route element={<AppLayout />}>
             <Route path="/" element={<Dashboard />} />
             <Route path="/bookings" element={<Bookings />} />
@@ -30,7 +32,7 @@ const App = () => (
             <Route path="/calendar" element={<CalendarPage />} />
             <Route path="/halls" element={<Halls />} />
             <Route path="/halls/:id/edit" element={<EditHall />} />
-            <Route path="/customers" element={<Customers />} />
+            <Route path="/offline" element={<OfflineBookings />} />
             <Route path="/analytics" element={<Analytics />} />
           </Route>
           <Route path="*" element={<NotFound />} />

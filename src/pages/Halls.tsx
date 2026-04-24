@@ -135,7 +135,7 @@ export default function Halls() {
               </div>
             </a>
             <a
-              href="https://wa.me/919999999999?text=Hi,%20I%20want%20to%20add%20a%20new%20hall%20to%20my%20VenueHub%20account."
+              href="https://wa.me/919999999999?text=Hi,%20I%20want%20to%20add%20a%20new%20hall%20to%20my%20BookMyHall%20account."
               target="_blank"
               rel="noreferrer"
               className="flex items-center gap-3 rounded-xl bg-muted/50 hover:bg-muted px-4 py-3 transition"
@@ -149,7 +149,7 @@ export default function Halls() {
               </div>
             </a>
             <a
-              href="mailto:admin@venuehub.app?subject=Add%20New%20Hall%20Request"
+              href="mailto:admin@bookmyhall.app?subject=Add%20New%20Hall%20Request"
               className="flex items-center gap-3 rounded-xl bg-muted/50 hover:bg-muted px-4 py-3 transition"
             >
               <div className="h-10 w-10 rounded-xl bg-info/15 flex items-center justify-center">
@@ -157,7 +157,7 @@ export default function Halls() {
               </div>
               <div className="flex-1">
                 <div className="text-xs text-muted-foreground">Email</div>
-                <div className="text-sm font-semibold">admin@venuehub.app</div>
+                <div className="text-sm font-semibold">admin@bookmyhall.app</div>
               </div>
             </a>
           </div>

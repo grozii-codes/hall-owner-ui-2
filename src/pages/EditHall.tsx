@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, Camera, Plus, Save, Trash2, Building2, ImagePlus } from "lucide-react";
+import { ArrowLeft, Camera, Plus, Save, Trash2, Building2, ImagePlus, MapPin, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 const FOOD_TYPES = ["Veg Only", "Non-Veg Only", "Veg & Non-Veg", "Jain"];
@@ -23,6 +23,38 @@ export default function EditHall() {
   const [hall, setHall] = useState<Hall | undefined>(original);
   const [newPolicy, setNewPolicy] = useState("");
   const [policySelect, setPolicySelect] = useState("");
+  const [locating, setLocating] = useState(false);
+
+  const fetchAddress = () => {
+    if (!navigator.geolocation) {
+      toast.error("Location not supported on this device");
+      return;
+    }
+    setLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        const { latitude, longitude } = pos.coords;
+        try {
+          const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`);
+          const data = await res.json();
+          const addr = data?.display_name as string | undefined;
+          const city = data?.address?.city || data?.address?.town || data?.address?.village || data?.address?.state_district;
+          if (addr) update("address", addr);
+          if (city) update("city", city);
+          toast.success("Address fetched from your location");
+        } catch {
+          toast.error("Couldn't reverse-geocode. Please type manually.");
+        } finally {
+          setLocating(false);
+        }
+      },
+      () => {
+        toast.error("Location permission denied");
+        setLocating(false);
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  };
 
   if (!hall) {
     return (
@@ -119,7 +151,13 @@ export default function EditHall() {
           <Input value={hall.name} onChange={(e) => update("name", e.target.value)} className="rounded-xl h-11" />
         </Field>
         <Field label="Address">
-          <Textarea value={hall.address} onChange={(e) => update("address", e.target.value)} className="rounded-xl min-h-[72px]" />
+          <div className="space-y-2">
+            <Textarea value={hall.address} onChange={(e) => update("address", e.target.value)} className="rounded-xl min-h-[72px]" placeholder="Building, street, area..." />
+            <Button type="button" variant="outline" onClick={fetchAddress} disabled={locating} className="w-full h-10 rounded-xl border-dashed">
+              {locating ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <MapPin className="h-4 w-4 mr-2 text-primary" />}
+              {locating ? "Fetching your location..." : "Auto-fetch from current location"}
+            </Button>
+          </div>
         </Field>
         <div className="grid grid-cols-2 gap-3">
           <Field label="City">
