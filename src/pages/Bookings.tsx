@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { bookings as allBookings, formatINR } from "@/data/mock";
-import { Search, Phone, MessageCircle, ChevronRight, Check, X, MapPin, Globe, Store, Calendar as CalIcon } from "lucide-react";
+import { Search, Phone, MessageCircle, Check, X, Globe, Store, Calendar as CalIcon, Sun, Moon } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { format, parseISO } from "date-fns";
 import { Link } from "react-router-dom";
@@ -14,15 +14,25 @@ const filters: { id: Filter; label: string }[] = [
   { id: "all", label: "All" },
   { id: "pending", label: "Pending" },
   { id: "confirmed", label: "Confirmed" },
-  { id: "completed", label: "Done" },
+  { id: "completed", label: "Completed" },
   { id: "rejected", label: "Rejected" },
 ];
 
 const sources: { id: Source; label: string; icon: typeof Globe | null }[] = [
-  { id: "all", label: "All", icon: null },
+  { id: "all", label: "All Sources", icon: null },
   { id: "online", label: "Online", icon: Globe },
   { id: "offline", label: "Offline", icon: Store },
 ];
+
+// Status visual config — single source of truth
+const statusConfig: Record<string, { label: string; bar: string; bg: string; text: string; dot: string }> = {
+  pending:   { label: "Pending",   bar: "bg-warning",     bg: "bg-warning-soft",     text: "text-warning",     dot: "bg-warning" },
+  confirmed: { label: "Confirmed", bar: "bg-success",     bg: "bg-success-soft",     text: "text-success",     dot: "bg-success" },
+  completed: { label: "Completed", bar: "bg-info",        bg: "bg-info-soft",        text: "text-info",        dot: "bg-info" },
+  rejected:  { label: "Rejected",  bar: "bg-destructive", bg: "bg-destructive-soft", text: "text-destructive", dot: "bg-destructive" },
+  offline:   { label: "Offline",   bar: "bg-muted-foreground", bg: "bg-muted",       text: "text-muted-foreground", dot: "bg-muted-foreground" },
+  cancelled: { label: "Cancelled", bar: "bg-destructive", bg: "bg-destructive-soft", text: "text-destructive", dot: "bg-destructive" },
+};
 
 export default function Bookings() {
   const [filter, setFilter] = useState<Filter>("all");
@@ -51,11 +61,23 @@ export default function Bookings() {
     rejected: allBookings.filter((b) => b.status === "rejected").length,
   }), []);
 
+  const activeFilters = (filter !== "all" ? 1 : 0) + (source !== "all" ? 1 : 0) + (date ? 1 : 0) + (q ? 1 : 0);
+
   return (
     <div className="px-4 lg:px-8 py-5 lg:py-6 max-w-5xl mx-auto space-y-4">
-      <div>
-        <h2 className="font-serif-display font-bold text-2xl lg:text-3xl">Bookings</h2>
-        <p className="text-sm text-muted-foreground mt-0.5">Tap any booking to view details, accept, or collect payment</p>
+      <div className="flex items-end justify-between gap-3">
+        <div>
+          <h2 className="font-serif-display text-2xl lg:text-3xl">Bookings</h2>
+          <p className="text-sm text-muted-foreground mt-0.5">{list.length} of {allBookings.length} bookings</p>
+        </div>
+        {activeFilters > 0 && (
+          <button
+            onClick={() => { setFilter("all"); setSource("all"); setDate(""); setQ(""); }}
+            className="text-xs font-semibold text-primary underline underline-offset-4"
+          >
+            Clear filters
+          </button>
+        )}
       </div>
 
       {/* Search */}
@@ -64,43 +86,40 @@ export default function Bookings() {
         <Input
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder="Search by customer, phone or booking ID..."
-          className="pl-10 h-12 rounded-xl bg-card border-border"
+          placeholder="Search name, phone or booking ID"
+          className="pl-10 h-11 rounded-md bg-card border-border"
         />
       </div>
 
-      {/* Date filter — labeled, mobile-friendly */}
-      <div className="flex items-center gap-2 rounded-xl bg-card border border-border px-3 h-12">
-        <CalIcon className="h-4 w-4 text-primary shrink-0" />
-        <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide shrink-0">Date</span>
-        <input
-          type="date"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-          className="flex-1 bg-transparent text-sm font-semibold outline-none min-w-0"
-        />
-        {date && (
-          <button onClick={() => setDate("")} className="text-xs font-semibold text-destructive shrink-0 px-2 py-1 rounded-md hover:bg-destructive-soft">
-            Clear
-          </button>
-        )}
-      </div>
+      {/* Filter row: Date + Source */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        <label className="flex items-center gap-2 rounded-md bg-card border border-border px-3 h-11">
+          <CalIcon className="h-4 w-4 text-primary shrink-0" />
+          <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-wide shrink-0">Date</span>
+          <input
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            className="flex-1 bg-transparent text-sm font-semibold outline-none min-w-0"
+          />
+          {date && (
+            <button onClick={() => setDate("")} className="text-destructive shrink-0 p-1">
+              <X className="h-3.5 w-3.5" />
+            </button>
+          )}
+        </label>
 
-      {/* Source toggle */}
-      <div>
-        <div className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground mb-1.5">Source</div>
-        <div className="inline-flex p-1 rounded-full bg-muted border border-border w-full">
-          {sources.map((s) => {
+        <div className="flex rounded-md bg-card border border-border h-11 overflow-hidden">
+          {sources.map((s, i) => {
             const Icon = s.icon;
             return (
               <button
                 key={s.id}
                 onClick={() => setSource(s.id)}
                 className={cn(
-                  "flex-1 flex items-center justify-center gap-1.5 px-4 h-9 rounded-full text-xs font-semibold tap-target transition-all",
-                  source === s.id
-                    ? "bg-card text-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground"
+                  "flex-1 flex items-center justify-center gap-1.5 text-xs font-semibold tap-target transition-colors",
+                  i > 0 && "border-l border-border",
+                  source === s.id ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
                 )}
               >
                 {Icon && <Icon className="h-3.5 w-3.5" />}
@@ -112,127 +131,143 @@ export default function Bookings() {
       </div>
 
       {/* Status filter chips with counts */}
-      <div>
-        <div className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground mb-1.5">Status</div>
-        <div className="flex gap-2 overflow-x-auto scrollbar-hide -mx-4 lg:mx-0 px-4 lg:px-0 pb-1">
-          {filters.map((f) => (
+      <div className="flex gap-2 overflow-x-auto scrollbar-hide -mx-4 lg:mx-0 px-4 lg:px-0">
+        {filters.map((f) => {
+          const isActive = filter === f.id;
+          return (
             <button
               key={f.id}
               onClick={() => setFilter(f.id)}
               className={cn(
-                "shrink-0 flex items-center gap-2 px-4 h-10 rounded-full text-sm font-semibold tap-target transition-colors",
-                filter === f.id
-                  ? "bg-primary text-primary-foreground shadow-glow"
-                  : "bg-card text-muted-foreground border border-border hover:text-foreground"
+                "shrink-0 flex items-center gap-2 px-3.5 h-9 rounded-md text-xs font-semibold tap-target border transition-colors",
+                isActive
+                  ? "bg-primary text-primary-foreground border-primary"
+                  : "bg-card text-foreground border-border hover:border-primary/40"
               )}
             >
+              {f.id !== "all" && (
+                <span className={cn("h-1.5 w-1.5 rounded-full", isActive ? "bg-primary-foreground" : statusConfig[f.id]?.dot)} />
+              )}
               {f.label}
               <span className={cn(
-                "rounded-full px-1.5 text-[10px] font-bold min-w-5 text-center",
-                filter === f.id ? "bg-primary-foreground/20" : "bg-muted"
+                "rounded px-1.5 text-[10px] font-bold min-w-[18px] text-center",
+                isActive ? "bg-primary-foreground/20" : "bg-muted text-muted-foreground"
               )}>
                 {counts[f.id]}
               </span>
             </button>
-          ))}
-        </div>
+          );
+        })}
       </div>
 
       {/* List */}
-      <div className="space-y-2.5">
+      <div className="space-y-2">
         {list.length === 0 && (
-          <div className="rounded-xl bg-card border border-dashed border-border p-10 text-center text-sm text-muted-foreground">
-            No bookings match your filter
+          <div className="rounded-md bg-card border border-dashed border-border p-12 text-center">
+            <Search className="h-8 w-8 text-muted-foreground/40 mx-auto mb-2" />
+            <div className="text-sm font-semibold text-foreground">No bookings found</div>
+            <div className="text-xs text-muted-foreground mt-1">Try changing your filters</div>
           </div>
         )}
-        {list.map((b) => (
-          <div key={b.id} className="rounded-xl bg-card border border-border shadow-[var(--shadow-card)] overflow-hidden">
-            <Link to={`/bookings/${b.id}`} className="block p-4 hover:bg-muted/30 transition-colors">
-              <div className="flex items-start gap-3">
-                <div className={cn(
-                  "h-10 w-10 rounded-md flex items-center justify-center font-display font-bold shrink-0",
-                  b.status === "confirmed" && "bg-success-soft text-success",
-                  b.status === "pending" && "bg-warning-soft text-warning",
-                  b.status === "completed" && "bg-info-soft text-info",
-                  b.status === "rejected" && "bg-destructive-soft text-destructive",
-                  b.status === "offline" && "bg-muted text-muted-foreground",
-                )}>
-                  {b.customerName.charAt(0)}
+        {list.map((b) => {
+          const cfg = statusConfig[b.status] || statusConfig.pending;
+          const paid = (b.payments?.reduce((s, p) => s + p.amount, 0)) ?? b.advancePaid;
+          const bal = b.amount - paid;
+          const ps = paid <= 0 ? "unpaid" : bal <= 0 ? "paid" : "partial";
+          const dateObj = parseISO(b.date);
+          const SlotIcon = b.slot === "morning" ? Sun : Moon;
+          const SourceIcon = b.source === "online" ? Globe : Store;
+
+          return (
+            <div key={b.id} className="rounded-md bg-card border border-border shadow-[var(--shadow-sm)] overflow-hidden">
+              <Link to={`/bookings/${b.id}`} className="flex hover:bg-muted/30 transition-colors">
+                {/* Left status bar */}
+                <div className={cn("w-1 shrink-0", cfg.bar)} />
+
+                {/* Date block */}
+                <div className="w-16 shrink-0 flex flex-col items-center justify-center py-3 border-r border-border bg-muted/20">
+                  <div className="text-[10px] font-bold uppercase text-muted-foreground tracking-wider">
+                    {format(dateObj, "MMM")}
+                  </div>
+                  <div className="font-serif-display text-2xl leading-none mt-0.5">
+                    {format(dateObj, "d")}
+                  </div>
+                  <div className="text-[10px] text-muted-foreground mt-0.5">
+                    {format(dateObj, "EEE")}
+                  </div>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="min-w-0">
-                      <div className="font-semibold truncate text-sm">{b.customerName}</div>
-                      <div className="text-[11px] text-muted-foreground font-mono">#{b.id}</div>
-                    </div>
+
+                {/* Content */}
+                <div className="flex-1 min-w-0 p-3">
+                  {/* Top row: badges */}
+                  <div className="flex items-center gap-1.5 mb-1.5 flex-wrap">
+                    <span className={cn("chip", cfg.bg, cfg.text)}>
+                      <span className={cn("h-1 w-1 rounded-full", cfg.dot)} />
+                      {cfg.label}
+                    </span>
                     <span className={cn(
-                      "chip uppercase tracking-wide",
-                      b.status === "confirmed" && "bg-success-soft text-success",
-                      b.status === "pending" && "bg-warning-soft text-warning",
-                      b.status === "completed" && "bg-info-soft text-info",
-                      b.status === "rejected" && "bg-destructive-soft text-destructive",
-                      b.status === "offline" && "bg-muted text-muted-foreground",
-                    )}>{b.status}</span>
+                      "chip",
+                      b.source === "online" ? "bg-info-soft text-info" : "bg-accent-soft text-accent"
+                    )}>
+                      <SourceIcon className="h-2.5 w-2.5" />
+                      {b.source === "online" ? "Online" : "Offline"}
+                    </span>
+                    <span className="chip bg-muted text-muted-foreground">
+                      <SlotIcon className="h-2.5 w-2.5" />
+                      {b.slot === "morning" ? "Day" : "Night"}
+                    </span>
                   </div>
-                  <div className="mt-1.5 text-xs text-muted-foreground truncate flex items-center gap-1.5">
-                    {b.source === "online" ? <Globe className="h-3 w-3 text-info" /> : <Store className="h-3 w-3 text-muted-foreground" />}
-                    <span className="font-medium text-foreground/80">{b.hallName}</span>
-                    {" • "}{format(parseISO(b.date), "d MMM")}{" • "}
-                    <span className="capitalize">{b.slot === "morning" ? "Day" : "Night"}</span>
+
+                  {/* Customer */}
+                  <div className="font-semibold text-sm text-foreground truncate">{b.customerName}</div>
+                  <div className="text-xs text-muted-foreground truncate mt-0.5">
+                    {b.hallName} · #{b.id}
                   </div>
-                  <div className="mt-1 text-[11px] text-muted-foreground truncate flex items-center gap-1">
-                    <MapPin className="h-3 w-3" /> {b.customerAddress}
-                  </div>
+
+                  {/* Bottom row: amount + payment + actions */}
                   <div className="mt-2 flex items-center justify-between gap-2">
                     <div className="flex items-baseline gap-2 min-w-0">
-                      <span className="font-display font-bold text-base text-primary">{formatINR(b.amount)}</span>
-                      {(() => {
-                        const paid = (b.payments?.reduce((s, p) => s + p.amount, 0)) ?? b.advancePaid;
-                        const bal = b.amount - paid;
-                        const ps = paid <= 0 ? "unpaid" : bal <= 0 ? "paid" : "partial";
-                        return (
-                          <span className={cn(
-                            "chip uppercase tracking-wide text-[9px]",
-                            ps === "paid" && "bg-success-soft text-success",
-                            ps === "partial" && "bg-warning-soft text-warning",
-                            ps === "unpaid" && "bg-destructive-soft text-destructive",
-                          )}>
-                            {ps === "paid" ? "Paid" : ps === "partial" ? `Bal ${formatINR(bal)}` : "Unpaid"}
-                          </span>
-                        );
-                      })()}
+                      <span className="font-serif-display text-base text-foreground">{formatINR(b.amount)}</span>
+                      <span className={cn(
+                        "chip",
+                        ps === "paid" && "bg-success-soft text-success",
+                        ps === "partial" && "bg-warning-soft text-warning",
+                        ps === "unpaid" && "bg-destructive-soft text-destructive",
+                      )}>
+                        {ps === "paid" ? "Paid" : ps === "partial" ? `Bal ${formatINR(bal)}` : "Unpaid"}
+                      </span>
                     </div>
                     <div className="flex items-center gap-1.5 shrink-0">
-                      <a href={`tel:${b.customerPhone}`} onClick={(e) => e.stopPropagation()} className="h-7 w-7 rounded-md bg-muted flex items-center justify-center tap-target">
+                      <a href={`tel:${b.customerPhone}`} onClick={(e) => e.stopPropagation()} className="h-8 w-8 rounded-md bg-muted hover:bg-primary hover:text-primary-foreground flex items-center justify-center tap-target transition-colors">
                         <Phone className="h-3.5 w-3.5" />
                       </a>
-                      <a href={`https://wa.me/${b.customerPhone.replace(/\D/g, "")}`} target="_blank" onClick={(e) => e.stopPropagation()} className="h-7 w-7 rounded-md bg-success-soft text-success flex items-center justify-center tap-target">
+                      <a href={`https://wa.me/${b.customerPhone.replace(/\D/g, "")}`} target="_blank" onClick={(e) => e.stopPropagation()} className="h-8 w-8 rounded-md bg-success-soft text-success hover:bg-success hover:text-success-foreground flex items-center justify-center tap-target transition-colors">
                         <MessageCircle className="h-3.5 w-3.5" />
                       </a>
-                      <ChevronRight className="h-4 w-4 text-muted-foreground ml-0.5" />
                     </div>
                   </div>
                 </div>
-              </div>
-            </Link>
-            {b.status === "pending" && (
-              <div className="grid grid-cols-2 gap-px bg-border border-t border-border">
-                <button
-                  onClick={() => toast.success(`Booking #${b.id} confirmed`)}
-                  className="flex items-center justify-center gap-1.5 py-2.5 bg-card hover:bg-success-soft text-success font-semibold text-sm tap-target transition-colors"
-                >
-                  <Check className="h-4 w-4" /> Accept
-                </button>
-                <button
-                  onClick={() => toast.error(`Booking #${b.id} rejected`)}
-                  className="flex items-center justify-center gap-1.5 py-2.5 bg-card hover:bg-destructive-soft text-destructive font-semibold text-sm tap-target transition-colors"
-                >
-                  <X className="h-4 w-4" /> Reject
-                </button>
-              </div>
-            )}
-          </div>
-        ))}
+              </Link>
+
+              {b.status === "pending" && (
+                <div className="grid grid-cols-2 gap-px bg-border border-t border-border">
+                  <button
+                    onClick={() => toast.success(`Booking #${b.id} confirmed`)}
+                    className="flex items-center justify-center gap-1.5 py-2.5 bg-card hover:bg-success hover:text-success-foreground text-success font-semibold text-sm tap-target transition-colors"
+                  >
+                    <Check className="h-4 w-4" /> Accept
+                  </button>
+                  <button
+                    onClick={() => toast.error(`Booking #${b.id} rejected`)}
+                    className="flex items-center justify-center gap-1.5 py-2.5 bg-card hover:bg-destructive hover:text-destructive-foreground text-destructive font-semibold text-sm tap-target transition-colors"
+                  >
+                    <X className="h-4 w-4" /> Reject
+                  </button>
+                </div>
+              )}
+            </div>
+          );
+        })}
       </div>
     </div>
   );
