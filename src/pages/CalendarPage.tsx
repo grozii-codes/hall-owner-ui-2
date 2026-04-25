@@ -12,13 +12,16 @@ import { Label } from "@/components/ui/label";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 
-const statusColors = {
-  available: { dot: "bg-success", chip: "bg-success-soft text-success", label: "Available" },
-  "morning-only": { dot: "bg-info", chip: "bg-info-soft text-info", label: "Half (Day)" },
-  "night-only": { dot: "bg-info", chip: "bg-info-soft text-info", label: "Half (Night)" },
-  pending: { dot: "bg-warning", chip: "bg-warning-soft text-warning", label: "Pending" },
-  full: { dot: "bg-destructive", chip: "bg-destructive-soft text-destructive", label: "Booked" },
-  past: { dot: "bg-muted", chip: "bg-muted text-muted-foreground", label: "Past" },
+// Each status gets a strong, identifiable visual — fill, border, text color
+const statusColors: Record<string, {
+  dot: string; chip: string; label: string; cellBg: string; cellBorder: string; dayText: string; shortLabel: string;
+}> = {
+  available:      { dot: "bg-success",     chip: "bg-success-soft text-success",         label: "Available",   cellBg: "bg-success-soft/40",     cellBorder: "border-success/30",     dayText: "text-success",       shortLabel: "Free" },
+  "morning-only": { dot: "bg-warning",     chip: "bg-warning-soft text-warning",         label: "Day Booked",  cellBg: "bg-warning-soft/60",     cellBorder: "border-warning/40",     dayText: "text-warning",       shortLabel: "Day" },
+  "night-only":   { dot: "bg-info",        chip: "bg-info-soft text-info",               label: "Night Booked",cellBg: "bg-info-soft/60",        cellBorder: "border-info/40",        dayText: "text-info",          shortLabel: "Night" },
+  pending:        { dot: "bg-warning",     chip: "bg-warning text-accent-foreground",    label: "Pending",     cellBg: "bg-warning/25",          cellBorder: "border-warning",        dayText: "text-warning",       shortLabel: "Pending" },
+  full:           { dot: "bg-destructive", chip: "bg-destructive text-destructive-foreground", label: "Fully Booked", cellBg: "bg-destructive/15", cellBorder: "border-destructive/60", dayText: "text-destructive",   shortLabel: "Booked" },
+  past:           { dot: "bg-muted",       chip: "bg-muted text-muted-foreground",       label: "Past",        cellBg: "bg-muted/30",            cellBorder: "border-transparent",    dayText: "text-muted-foreground/60", shortLabel: "" },
 };
 
 export default function CalendarPage() {
