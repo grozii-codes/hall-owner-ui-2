@@ -17,10 +17,10 @@ const statusColors: Record<string, {
   dot: string; chip: string; label: string; cellBg: string; cellBorder: string; dayText: string; shortLabel: string;
 }> = {
   available:      { dot: "bg-success",     chip: "bg-success text-success-foreground",         label: "Available",      cellBg: "bg-success-soft/60",     cellBorder: "border-success/50",     dayText: "text-success",       shortLabel: "Free" },
-  "morning-only": { dot: "bg-info",        chip: "bg-info text-info-foreground",               label: "Partial (Day)",  cellBg: "bg-info-soft/70",        cellBorder: "border-info/60",        dayText: "text-info",          shortLabel: "Partial" },
-  "night-only":   { dot: "bg-info",        chip: "bg-info text-info-foreground",               label: "Partial (Night)",cellBg: "bg-info-soft/70",        cellBorder: "border-info/60",        dayText: "text-info",          shortLabel: "Partial" },
-  pending:        { dot: "bg-warning",     chip: "bg-warning text-accent-foreground",          label: "Pending",        cellBg: "bg-warning/35",          cellBorder: "border-warning",        dayText: "text-warning",       shortLabel: "Pending" },
-  full:           { dot: "bg-destructive", chip: "bg-destructive text-destructive-foreground", label: "Fully Booked",   cellBg: "bg-destructive/20",      cellBorder: "border-destructive/70", dayText: "text-destructive",   shortLabel: "Booked" },
+  "morning-only": { dot: "bg-info",        chip: "bg-info text-info-foreground",               label: "Partial (Day)",  cellBg: "bg-info-soft/70",        cellBorder: "border-info/60",        dayText: "text-info",          shortLabel: "1/2" },
+  "night-only":   { dot: "bg-info",        chip: "bg-info text-info-foreground",               label: "Partial (Night)",cellBg: "bg-info-soft/70",        cellBorder: "border-info/60",        dayText: "text-info",          shortLabel: "1/2" },
+  pending:        { dot: "bg-warning",     chip: "bg-warning text-accent-foreground",          label: "Pending",        cellBg: "bg-warning/35",          cellBorder: "border-warning",        dayText: "text-warning",       shortLabel: "Wait" },
+  full:           { dot: "bg-destructive", chip: "bg-destructive text-destructive-foreground", label: "Fully Booked",   cellBg: "bg-destructive/20",      cellBorder: "border-destructive/70", dayText: "text-destructive",   shortLabel: "Full" },
   past:           { dot: "bg-muted",       chip: "bg-muted text-muted-foreground",             label: "Past",           cellBg: "bg-muted/20",            cellBorder: "border-transparent",    dayText: "text-muted-foreground/50", shortLabel: "" },
 };
 
@@ -119,23 +119,23 @@ export default function CalendarPage() {
                     isToday && "h-6 w-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs"
                   )}>{format(d, "d")}</span>
 
-                  {/* Slot icons - quick visual of which slot is booked */}
+                  {/* Slot icons - desktop only (mobile cells are too narrow) */}
                   {info.status !== "past" && info.status !== "available" && (
-                    <div className="flex items-center gap-0.5">
-                      {hasMorning && <Sun className="h-2.5 w-2.5 text-warning" strokeWidth={3} />}
-                      {hasNight && <Moon className="h-2.5 w-2.5 text-info" strokeWidth={3} />}
+                    <div className="hidden lg:flex items-center gap-0.5">
+                      {hasMorning && <Sun className="h-3 w-3 text-warning" strokeWidth={3} />}
+                      {hasNight && <Moon className="h-3 w-3 text-info" strokeWidth={3} />}
                     </div>
                   )}
                 </div>
 
                 {/* Status pill at bottom */}
                 {info.status !== "past" && info.status !== "available" && (
-                  <div className={cn("mt-auto text-[8px] lg:text-[10px] font-bold rounded px-1 py-0.5 text-center leading-tight uppercase tracking-wider", colors.chip)}>
+                  <div className={cn("mt-auto text-[8px] lg:text-[10px] font-bold rounded px-0.5 py-0.5 text-center leading-tight uppercase truncate", colors.chip)}>
                     {colors.shortLabel}
                   </div>
                 )}
                 {info.status === "available" && !isOtherMonth && (
-                  <div className="mt-auto text-[8px] lg:text-[10px] font-bold text-success/70 text-center uppercase tracking-wider">
+                  <div className="mt-auto text-[8px] lg:text-[10px] font-bold text-success/70 text-center uppercase truncate">
                     Free
                   </div>
                 )}
