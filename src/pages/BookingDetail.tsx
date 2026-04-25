@@ -70,7 +70,13 @@ export default function BookingDetail() {
   const handleConfirm = () => {
     b.status = "confirmed";
     refresh();
-    toast.success("Booking confirmed", { description: `${b.customerName} has been notified.` });
+    try {
+      const hall = halls.find((h) => h.id === b.hallId);
+      generateBookingConfirmationPdf(b, hall);
+      toast.success("Booking confirmed", { description: "Confirmation PDF downloaded." });
+    } catch {
+      toast.success("Booking confirmed", { description: `${b.customerName} has been notified.` });
+    }
   };
   const handleReject = () => {
     b.status = "rejected";
