@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { halls as initialHalls, DEFAULT_POLICIES, type Hall } from "@/data/mock";
+import { halls as initialHalls, DEFAULT_POLICIES, HALL_TYPES, type Hall } from "@/data/mock";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
