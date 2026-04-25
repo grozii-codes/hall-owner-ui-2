@@ -123,6 +123,8 @@ export const halls: Hall[] = [
       "Night bookings must vacate the hall by 9:00 AM next morning",
       "Loud music allowed only till 10:00 PM",
     ],
+    hallType: "Wedding Hall",
+    supportNumber: "+919876500001",
   },
   {
     id: "h2",
