@@ -119,11 +119,11 @@ export default function CalendarPage() {
                     isToday && "h-6 w-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs"
                   )}>{format(d, "d")}</span>
 
-                  {/* Slot icons - quick visual of which slot is booked */}
+                  {/* Slot icons - desktop only (mobile cells are too narrow) */}
                   {info.status !== "past" && info.status !== "available" && (
-                    <div className="flex items-center gap-0.5">
-                      {hasMorning && <Sun className="h-2.5 w-2.5 text-warning" strokeWidth={3} />}
-                      {hasNight && <Moon className="h-2.5 w-2.5 text-info" strokeWidth={3} />}
+                    <div className="hidden lg:flex items-center gap-0.5">
+                      {hasMorning && <Sun className="h-3 w-3 text-warning" strokeWidth={3} />}
+                      {hasNight && <Moon className="h-3 w-3 text-info" strokeWidth={3} />}
                     </div>
                   )}
                 </div>
