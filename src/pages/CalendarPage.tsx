@@ -130,12 +130,12 @@ export default function CalendarPage() {
 
                 {/* Status pill at bottom */}
                 {info.status !== "past" && info.status !== "available" && (
-                  <div className={cn("mt-auto text-[8px] lg:text-[10px] font-bold rounded px-1 py-0.5 text-center leading-tight uppercase tracking-wider", colors.chip)}>
+                  <div className={cn("mt-auto text-[8px] lg:text-[10px] font-bold rounded px-0.5 py-0.5 text-center leading-tight uppercase truncate", colors.chip)}>
                     {colors.shortLabel}
                   </div>
                 )}
                 {info.status === "available" && !isOtherMonth && (
-                  <div className="mt-auto text-[8px] lg:text-[10px] font-bold text-success/70 text-center uppercase tracking-wider">
+                  <div className="mt-auto text-[8px] lg:text-[10px] font-bold text-success/70 text-center uppercase truncate">
                     Free
                   </div>
                 )}
