@@ -1,5 +1,6 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { bookings, formatINR, type PaymentEntry, type PaymentMethod } from "@/data/mock";
+import { bookings, halls, formatINR, type PaymentEntry, type PaymentMethod } from "@/data/mock";
+import { generateBookingConfirmationPdf } from "@/lib/bookingPdf";
 import { ArrowLeft, Phone, MessageCircle, MapPin, Calendar, FileDown, CheckCircle2, XCircle, Building2, User, Hash, Plus, Banknote, Smartphone, CreditCard, Landmark, FileText, Trash2, Globe, Store, Ban, Receipt } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
