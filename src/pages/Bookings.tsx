@@ -211,15 +211,15 @@ export default function Bookings() {
                 {/* Left status bar */}
                 <div className={cn("w-1.5 shrink-0", cfg.bar)} />
 
-                {/* Date block */}
-                <div className="w-16 shrink-0 flex flex-col items-center justify-center py-3 border-r border-border bg-muted/20">
-                  <div className="text-[10px] font-bold uppercase text-muted-foreground tracking-wider">
+                {/* Date block — compact */}
+                <div className="w-12 shrink-0 flex flex-col items-center justify-center py-2 border-r border-border bg-muted/20">
+                  <div className="text-[9px] font-bold uppercase text-muted-foreground tracking-wide">
                     {format(dateObj, "MMM")}
                   </div>
-                  <div className="font-serif-display text-2xl leading-none mt-0.5">
+                  <div className="font-serif-display text-xl leading-none mt-0.5">
                     {format(dateObj, "d")}
                   </div>
-                  <div className="text-[10px] text-muted-foreground mt-0.5">
+                  <div className="text-[9px] text-muted-foreground mt-0.5">
                     {format(dateObj, "EEE")}
                   </div>
                 </div>
