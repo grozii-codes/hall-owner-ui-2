@@ -150,6 +150,15 @@ export default function EditHall() {
         <Field label="Hall Name">
           <Input value={hall.name} onChange={(e) => update("name", e.target.value)} className="rounded-xl h-11" />
         </Field>
+        <Field label="Hall Type">
+          <Select value={hall.hallType ?? ""} onValueChange={(v) => update("hallType", v)}>
+            <SelectTrigger className="rounded-xl h-11"><SelectValue placeholder="Select hall type" /></SelectTrigger>
+            <SelectContent>{HALL_TYPES.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
+          </Select>
+        </Field>
+        <Field label="Support / Contact Number">
+          <Input value={hall.supportNumber ?? ""} onChange={(e) => update("supportNumber", e.target.value)} placeholder="e.g. +91 98765 43210" className="rounded-xl h-11" inputMode="tel" />
+        </Field>
         <Field label="Address">
           <div className="space-y-2">
             <Textarea value={hall.address} onChange={(e) => update("address", e.target.value)} className="rounded-xl min-h-[72px]" placeholder="Building, street, area..." />
