@@ -56,7 +56,11 @@ export interface Hall {
   morningSlotTime?: string;
   nightSlotTime?: string;
   policies?: string[];
+  hallType?: string;
+  supportNumber?: string;
 }
+
+export const HALL_TYPES = ["Wedding Hall", "Lawn", "Banquet Hall", "Convention Center", "Marriage Garden"];
 
 export const DEFAULT_POLICIES = [
   "Guests must arrive on time as per booking slot",
