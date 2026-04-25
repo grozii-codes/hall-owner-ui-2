@@ -31,6 +31,8 @@ export interface Booking {
   createdAt: string;
   notes?: string;
   payments?: PaymentEntry[];
+  guests?: number;
+  functionType?: string;
 }
 
 export interface Hall {
