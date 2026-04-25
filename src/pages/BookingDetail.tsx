@@ -395,6 +395,15 @@ export default function BookingDetail() {
             <Button onClick={shareWA} variant="outline" className="h-11 rounded-xl font-semibold tap-target">
               <FileDown className="h-4 w-4 mr-1.5" /> Share Receipt
             </Button>
+            {(b.status === "confirmed" || b.status === "completed" || b.status === "offline") && (
+              <Button
+                onClick={() => { generateBookingConfirmationPdf(b, halls.find((h) => h.id === b.hallId)); toast.success("PDF downloaded"); }}
+                variant="outline"
+                className="h-11 rounded-xl font-semibold tap-target"
+              >
+                <FileDown className="h-4 w-4 mr-1.5" /> Download PDF
+              </Button>
+            )}
             {b.status === "confirmed" && (
               <Button onClick={handleMarkCompleted} variant="outline" className="h-11 rounded-xl border-info text-info hover:bg-info-soft font-semibold tap-target">
                 <CheckCircle2 className="h-4 w-4 mr-1.5" /> Mark Completed
