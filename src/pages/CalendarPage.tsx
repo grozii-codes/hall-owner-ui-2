@@ -55,11 +55,11 @@ export default function CalendarPage() {
       </div>
 
       {/* Legend */}
-      <div className="flex flex-wrap gap-2.5 text-xs">
-        {(["available", "morning-only", "pending", "full"] as const).map((k) => (
-          <div key={k} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-card border border-border/60">
-            <span className={cn("h-2 w-2 rounded-full", statusColors[k].dot)} />
-            <span className="font-semibold">{statusColors[k].label}</span>
+      <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-1.5 text-xs">
+        {(["available", "morning-only", "night-only", "pending", "full"] as const).map((k) => (
+          <div key={k} className={cn("flex items-center gap-1.5 px-2.5 py-1.5 rounded-md border", statusColors[k].cellBg, statusColors[k].cellBorder)}>
+            <span className={cn("h-2.5 w-2.5 rounded-sm", statusColors[k].dot)} />
+            <span className={cn("font-bold text-[11px]", statusColors[k].dayText)}>{statusColors[k].label}</span>
           </div>
         ))}
       </div>
