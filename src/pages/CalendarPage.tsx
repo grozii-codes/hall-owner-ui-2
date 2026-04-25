@@ -17,10 +17,10 @@ const statusColors: Record<string, {
   dot: string; chip: string; label: string; cellBg: string; cellBorder: string; dayText: string; shortLabel: string;
 }> = {
   available:      { dot: "bg-success",     chip: "bg-success text-success-foreground",         label: "Available",      cellBg: "bg-success-soft/60",     cellBorder: "border-success/50",     dayText: "text-success",       shortLabel: "Free" },
-  "morning-only": { dot: "bg-info",        chip: "bg-info text-info-foreground",               label: "Partial (Day)",  cellBg: "bg-info-soft/70",        cellBorder: "border-info/60",        dayText: "text-info",          shortLabel: "Partial" },
-  "night-only":   { dot: "bg-info",        chip: "bg-info text-info-foreground",               label: "Partial (Night)",cellBg: "bg-info-soft/70",        cellBorder: "border-info/60",        dayText: "text-info",          shortLabel: "Partial" },
-  pending:        { dot: "bg-warning",     chip: "bg-warning text-accent-foreground",          label: "Pending",        cellBg: "bg-warning/35",          cellBorder: "border-warning",        dayText: "text-warning",       shortLabel: "Pending" },
-  full:           { dot: "bg-destructive", chip: "bg-destructive text-destructive-foreground", label: "Fully Booked",   cellBg: "bg-destructive/20",      cellBorder: "border-destructive/70", dayText: "text-destructive",   shortLabel: "Booked" },
+  "morning-only": { dot: "bg-info",        chip: "bg-info text-info-foreground",               label: "Partial (Day)",  cellBg: "bg-info-soft/70",        cellBorder: "border-info/60",        dayText: "text-info",          shortLabel: "1/2" },
+  "night-only":   { dot: "bg-info",        chip: "bg-info text-info-foreground",               label: "Partial (Night)",cellBg: "bg-info-soft/70",        cellBorder: "border-info/60",        dayText: "text-info",          shortLabel: "1/2" },
+  pending:        { dot: "bg-warning",     chip: "bg-warning text-accent-foreground",          label: "Pending",        cellBg: "bg-warning/35",          cellBorder: "border-warning",        dayText: "text-warning",       shortLabel: "Wait" },
+  full:           { dot: "bg-destructive", chip: "bg-destructive text-destructive-foreground", label: "Fully Booked",   cellBg: "bg-destructive/20",      cellBorder: "border-destructive/70", dayText: "text-destructive",   shortLabel: "Full" },
   past:           { dot: "bg-muted",       chip: "bg-muted text-muted-foreground",             label: "Past",           cellBg: "bg-muted/20",            cellBorder: "border-transparent",    dayText: "text-muted-foreground/50", shortLabel: "" },
 };
 
