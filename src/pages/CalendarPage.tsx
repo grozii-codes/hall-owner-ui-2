@@ -54,12 +54,17 @@ export default function CalendarPage() {
         </select>
       </div>
 
-      {/* Legend */}
-      <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-1.5 text-xs">
-        {(["available", "morning-only", "night-only", "pending", "full"] as const).map((k) => (
-          <div key={k} className={cn("flex items-center gap-1.5 px-2.5 py-1.5 rounded-md border", statusColors[k].cellBg, statusColors[k].cellBorder)}>
-            <span className={cn("h-2.5 w-2.5 rounded-sm", statusColors[k].dot)} />
-            <span className={cn("font-bold text-[11px]", statusColors[k].dayText)}>{statusColors[k].label}</span>
+      {/* Legend — clear color key */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 text-xs">
+        {([
+          { key: "available", label: "Available" },
+          { key: "morning-only", label: "Partial" },
+          { key: "pending", label: "Pending" },
+          { key: "full", label: "Booked" },
+        ] as const).map(({ key, label }) => (
+          <div key={key} className={cn("flex items-center gap-1.5 px-2.5 py-1.5 rounded-md border-2", statusColors[key].cellBg, statusColors[key].cellBorder)}>
+            <span className={cn("h-2.5 w-2.5 rounded-sm", statusColors[key].dot)} />
+            <span className={cn("font-bold text-[11px]", statusColors[key].dayText)}>{label}</span>
           </div>
         ))}
       </div>
