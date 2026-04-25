@@ -152,6 +152,8 @@ export const halls: Hall[] = [
       "Do not waste food",
       "Vacate promptly after night booking",
     ],
+    hallType: "Lawn",
+    supportNumber: "+919876500002",
   },
 ];
 
