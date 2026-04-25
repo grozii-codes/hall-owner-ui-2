@@ -64,100 +64,120 @@ export default function Bookings() {
   const activeFilters = (filter !== "all" ? 1 : 0) + (source !== "all" ? 1 : 0) + (date ? 1 : 0) + (q ? 1 : 0);
 
   return (
-    <div className="px-4 lg:px-8 py-5 lg:py-6 max-w-5xl mx-auto space-y-4">
+    <div className="px-4 lg:px-8 py-4 lg:py-6 max-w-5xl mx-auto space-y-3">
+      {/* Title row */}
       <div className="flex items-end justify-between gap-3">
         <div>
           <h2 className="font-serif-display text-2xl lg:text-3xl">Bookings</h2>
-          <p className="text-sm text-muted-foreground mt-0.5">{list.length} of {allBookings.length} bookings</p>
+          <p className="text-sm text-muted-foreground mt-0.5">{list.length} of {allBookings.length} shown</p>
         </div>
         {activeFilters > 0 && (
           <button
             onClick={() => { setFilter("all"); setSource("all"); setDate(""); setQ(""); }}
             className="text-xs font-semibold text-primary underline underline-offset-4"
           >
-            Clear filters
+            Clear all
           </button>
         )}
       </div>
 
-      {/* Search */}
-      <div className="relative">
-        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-          placeholder="Search name, phone or booking ID"
-          className="pl-10 h-11 rounded-md bg-card border-border"
-        />
-      </div>
+      {/* Sticky filter bar */}
+      <div className="sticky top-15 lg:top-16 z-20 -mx-4 lg:mx-0 px-4 lg:px-0 pt-1 pb-2 bg-background/95 backdrop-blur-md space-y-2">
+        {/* Search + Date in one compact row */}
+        <div className="flex gap-2">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              placeholder="Search name, phone, ID..."
+              className="pl-9 h-11 rounded-md bg-card border-border text-sm"
+            />
+            {q && (
+              <button onClick={() => setQ("")} className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-muted-foreground hover:text-destructive">
+                <X className="h-3.5 w-3.5" />
+              </button>
+            )}
+          </div>
+          <label className={cn(
+            "relative flex items-center justify-center rounded-md border h-11 px-3 cursor-pointer shrink-0 transition-colors",
+            date ? "bg-primary text-primary-foreground border-primary" : "bg-card border-border"
+          )}>
+            <CalIcon className="h-4 w-4" />
+            {date && <span className="ml-1.5 text-xs font-bold">{format(parseISO(date), "d MMM")}</span>}
+            <input
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              className="absolute inset-0 opacity-0 cursor-pointer"
+            />
+            {date && (
+              <button
+                onClick={(e) => { e.preventDefault(); setDate(""); }}
+                className="ml-1.5 -mr-1 p-0.5 hover:bg-primary-foreground/20 rounded"
+              >
+                <X className="h-3 w-3" />
+              </button>
+            )}
+          </label>
+        </div>
 
-      {/* Filter row: Date + Source */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-        <label className="flex items-center gap-2 rounded-md bg-card border border-border px-3 h-11">
-          <CalIcon className="h-4 w-4 text-primary shrink-0" />
-          <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-wide shrink-0">Date</span>
-          <input
-            type="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-            className="flex-1 bg-transparent text-sm font-semibold outline-none min-w-0"
-          />
-          {date && (
-            <button onClick={() => setDate("")} className="text-destructive shrink-0 p-1">
-              <X className="h-3.5 w-3.5" />
-            </button>
-          )}
-        </label>
+        {/* Combined chips: status + source — single horizontal scroll */}
+        <div className="flex gap-1.5 overflow-x-auto scrollbar-hide -mx-4 lg:mx-0 px-4 lg:px-0">
+          {filters.map((f) => {
+            const isActive = filter === f.id;
+            return (
+              <button
+                key={f.id}
+                onClick={() => setFilter(f.id)}
+                className={cn(
+                  "shrink-0 flex items-center gap-1.5 px-3 h-8 rounded-full text-xs font-semibold tap-target border transition-colors",
+                  isActive
+                    ? "bg-primary text-primary-foreground border-primary"
+                    : "bg-card text-foreground border-border hover:border-primary/40"
+                )}
+              >
+                {f.id !== "all" && (
+                  <span className={cn("h-1.5 w-1.5 rounded-full", isActive ? "bg-primary-foreground" : statusConfig[f.id]?.dot)} />
+                )}
+                {f.label}
+                <span className={cn(
+                  "rounded-full px-1.5 text-[10px] font-bold min-w-[18px] text-center leading-tight",
+                  isActive ? "bg-primary-foreground/20" : "bg-muted text-muted-foreground"
+                )}>
+                  {counts[f.id]}
+                </span>
+              </button>
+            );
+          })}
 
-        <div className="flex rounded-md bg-card border border-border h-11 overflow-hidden">
-          {sources.map((s, i) => {
-            const Icon = s.icon;
+          {/* Divider */}
+          <div className="shrink-0 w-px bg-border mx-1" />
+
+          {/* Source toggles — icon only, compact */}
+          {sources.filter(s => s.id !== "all").map((s) => {
+            const Icon = s.icon!;
+            const isActive = source === s.id;
             return (
               <button
                 key={s.id}
-                onClick={() => setSource(s.id)}
+                onClick={() => setSource(isActive ? "all" : s.id)}
+                aria-label={s.label}
                 className={cn(
-                  "flex-1 flex items-center justify-center gap-1.5 text-xs font-semibold tap-target transition-colors",
-                  i > 0 && "border-l border-border",
-                  source === s.id ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
+                  "shrink-0 flex items-center gap-1.5 px-3 h-8 rounded-full text-xs font-semibold tap-target border transition-colors",
+                  isActive
+                    ? s.id === "online"
+                      ? "bg-info text-info-foreground border-info"
+                      : "bg-accent text-accent-foreground border-accent"
+                    : "bg-card text-muted-foreground border-border hover:border-primary/40"
                 )}
               >
-                {Icon && <Icon className="h-3.5 w-3.5" />}
+                <Icon className="h-3.5 w-3.5" />
                 {s.label}
               </button>
             );
           })}
         </div>
-      </div>
-
-      {/* Status filter chips with counts */}
-      <div className="flex gap-2 overflow-x-auto scrollbar-hide -mx-4 lg:mx-0 px-4 lg:px-0">
-        {filters.map((f) => {
-          const isActive = filter === f.id;
-          return (
-            <button
-              key={f.id}
-              onClick={() => setFilter(f.id)}
-              className={cn(
-                "shrink-0 flex items-center gap-2 px-3.5 h-9 rounded-md text-xs font-semibold tap-target border transition-colors",
-                isActive
-                  ? "bg-primary text-primary-foreground border-primary"
-                  : "bg-card text-foreground border-border hover:border-primary/40"
-              )}
-            >
-              {f.id !== "all" && (
-                <span className={cn("h-1.5 w-1.5 rounded-full", isActive ? "bg-primary-foreground" : statusConfig[f.id]?.dot)} />
-              )}
-              {f.label}
-              <span className={cn(
-                "rounded px-1.5 text-[10px] font-bold min-w-[18px] text-center",
-                isActive ? "bg-primary-foreground/20" : "bg-muted text-muted-foreground"
-              )}>
-                {counts[f.id]}
-              </span>
-            </button>
-          );
-        })}
       </div>
 
       {/* List */}
@@ -191,15 +211,15 @@ export default function Bookings() {
                 {/* Left status bar */}
                 <div className={cn("w-1.5 shrink-0", cfg.bar)} />
 
-                {/* Date block */}
-                <div className="w-16 shrink-0 flex flex-col items-center justify-center py-3 border-r border-border bg-muted/20">
-                  <div className="text-[10px] font-bold uppercase text-muted-foreground tracking-wider">
+                {/* Date block — compact */}
+                <div className="w-12 shrink-0 flex flex-col items-center justify-center py-2 border-r border-border bg-muted/20">
+                  <div className="text-[9px] font-bold uppercase text-muted-foreground tracking-wide">
                     {format(dateObj, "MMM")}
                   </div>
-                  <div className="font-serif-display text-2xl leading-none mt-0.5">
+                  <div className="font-serif-display text-xl leading-none mt-0.5">
                     {format(dateObj, "d")}
                   </div>
-                  <div className="text-[10px] text-muted-foreground mt-0.5">
+                  <div className="text-[9px] text-muted-foreground mt-0.5">
                     {format(dateObj, "EEE")}
                   </div>
                 </div>
