@@ -16,12 +16,12 @@ import { toast } from "sonner";
 const statusColors: Record<string, {
   dot: string; chip: string; label: string; cellBg: string; cellBorder: string; dayText: string; shortLabel: string;
 }> = {
-  available:      { dot: "bg-success",     chip: "bg-success-soft text-success",         label: "Available",   cellBg: "bg-success-soft/40",     cellBorder: "border-success/30",     dayText: "text-success",       shortLabel: "Free" },
-  "morning-only": { dot: "bg-warning",     chip: "bg-warning-soft text-warning",         label: "Day Booked",  cellBg: "bg-warning-soft/60",     cellBorder: "border-warning/40",     dayText: "text-warning",       shortLabel: "Day" },
-  "night-only":   { dot: "bg-info",        chip: "bg-info-soft text-info",               label: "Night Booked",cellBg: "bg-info-soft/60",        cellBorder: "border-info/40",        dayText: "text-info",          shortLabel: "Night" },
-  pending:        { dot: "bg-warning",     chip: "bg-warning text-accent-foreground",    label: "Pending",     cellBg: "bg-warning/25",          cellBorder: "border-warning",        dayText: "text-warning",       shortLabel: "Pending" },
-  full:           { dot: "bg-destructive", chip: "bg-destructive text-destructive-foreground", label: "Fully Booked", cellBg: "bg-destructive/15", cellBorder: "border-destructive/60", dayText: "text-destructive",   shortLabel: "Booked" },
-  past:           { dot: "bg-muted",       chip: "bg-muted text-muted-foreground",       label: "Past",        cellBg: "bg-muted/30",            cellBorder: "border-transparent",    dayText: "text-muted-foreground/60", shortLabel: "" },
+  available:      { dot: "bg-success",     chip: "bg-success text-success-foreground",         label: "Available",      cellBg: "bg-success-soft/60",     cellBorder: "border-success/50",     dayText: "text-success",       shortLabel: "Free" },
+  "morning-only": { dot: "bg-info",        chip: "bg-info text-info-foreground",               label: "Partial (Day)",  cellBg: "bg-info-soft/70",        cellBorder: "border-info/60",        dayText: "text-info",          shortLabel: "Partial" },
+  "night-only":   { dot: "bg-info",        chip: "bg-info text-info-foreground",               label: "Partial (Night)",cellBg: "bg-info-soft/70",        cellBorder: "border-info/60",        dayText: "text-info",          shortLabel: "Partial" },
+  pending:        { dot: "bg-warning",     chip: "bg-warning text-accent-foreground",          label: "Pending",        cellBg: "bg-warning/35",          cellBorder: "border-warning",        dayText: "text-warning",       shortLabel: "Pending" },
+  full:           { dot: "bg-destructive", chip: "bg-destructive text-destructive-foreground", label: "Fully Booked",   cellBg: "bg-destructive/20",      cellBorder: "border-destructive/70", dayText: "text-destructive",   shortLabel: "Booked" },
+  past:           { dot: "bg-muted",       chip: "bg-muted text-muted-foreground",             label: "Past",           cellBg: "bg-muted/20",            cellBorder: "border-transparent",    dayText: "text-muted-foreground/50", shortLabel: "" },
 };
 
 export default function CalendarPage() {
@@ -54,12 +54,17 @@ export default function CalendarPage() {
         </select>
       </div>
 
-      {/* Legend */}
-      <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-1.5 text-xs">
-        {(["available", "morning-only", "night-only", "pending", "full"] as const).map((k) => (
-          <div key={k} className={cn("flex items-center gap-1.5 px-2.5 py-1.5 rounded-md border", statusColors[k].cellBg, statusColors[k].cellBorder)}>
-            <span className={cn("h-2.5 w-2.5 rounded-sm", statusColors[k].dot)} />
-            <span className={cn("font-bold text-[11px]", statusColors[k].dayText)}>{statusColors[k].label}</span>
+      {/* Legend — clear color key */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 text-xs">
+        {([
+          { key: "available", label: "Available" },
+          { key: "morning-only", label: "Partial" },
+          { key: "pending", label: "Pending" },
+          { key: "full", label: "Booked" },
+        ] as const).map(({ key, label }) => (
+          <div key={key} className={cn("flex items-center gap-1.5 px-2.5 py-1.5 rounded-md border-2", statusColors[key].cellBg, statusColors[key].cellBorder)}>
+            <span className={cn("h-2.5 w-2.5 rounded-sm", statusColors[key].dot)} />
+            <span className={cn("font-bold text-[11px]", statusColors[key].dayText)}>{label}</span>
           </div>
         ))}
       </div>
