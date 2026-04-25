@@ -12,13 +12,16 @@ import { Label } from "@/components/ui/label";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 
-const statusColors = {
-  available: { dot: "bg-success", chip: "bg-success-soft text-success", label: "Available" },
-  "morning-only": { dot: "bg-info", chip: "bg-info-soft text-info", label: "Half (Day)" },
-  "night-only": { dot: "bg-info", chip: "bg-info-soft text-info", label: "Half (Night)" },
-  pending: { dot: "bg-warning", chip: "bg-warning-soft text-warning", label: "Pending" },
-  full: { dot: "bg-destructive", chip: "bg-destructive-soft text-destructive", label: "Booked" },
-  past: { dot: "bg-muted", chip: "bg-muted text-muted-foreground", label: "Past" },
+// Each status gets a strong, identifiable visual — fill, border, text color
+const statusColors: Record<string, {
+  dot: string; chip: string; label: string; cellBg: string; cellBorder: string; dayText: string; shortLabel: string;
+}> = {
+  available:      { dot: "bg-success",     chip: "bg-success-soft text-success",         label: "Available",   cellBg: "bg-success-soft/40",     cellBorder: "border-success/30",     dayText: "text-success",       shortLabel: "Free" },
+  "morning-only": { dot: "bg-warning",     chip: "bg-warning-soft text-warning",         label: "Day Booked",  cellBg: "bg-warning-soft/60",     cellBorder: "border-warning/40",     dayText: "text-warning",       shortLabel: "Day" },
+  "night-only":   { dot: "bg-info",        chip: "bg-info-soft text-info",               label: "Night Booked",cellBg: "bg-info-soft/60",        cellBorder: "border-info/40",        dayText: "text-info",          shortLabel: "Night" },
+  pending:        { dot: "bg-warning",     chip: "bg-warning text-accent-foreground",    label: "Pending",     cellBg: "bg-warning/25",          cellBorder: "border-warning",        dayText: "text-warning",       shortLabel: "Pending" },
+  full:           { dot: "bg-destructive", chip: "bg-destructive text-destructive-foreground", label: "Fully Booked", cellBg: "bg-destructive/15", cellBorder: "border-destructive/60", dayText: "text-destructive",   shortLabel: "Booked" },
+  past:           { dot: "bg-muted",       chip: "bg-muted text-muted-foreground",       label: "Past",        cellBg: "bg-muted/30",            cellBorder: "border-transparent",    dayText: "text-muted-foreground/60", shortLabel: "" },
 };
 
 export default function CalendarPage() {
@@ -52,11 +55,11 @@ export default function CalendarPage() {
       </div>
 
       {/* Legend */}
-      <div className="flex flex-wrap gap-2.5 text-xs">
-        {(["available", "morning-only", "pending", "full"] as const).map((k) => (
-          <div key={k} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-card border border-border/60">
-            <span className={cn("h-2 w-2 rounded-full", statusColors[k].dot)} />
-            <span className="font-semibold">{statusColors[k].label}</span>
+      <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-1.5 text-xs">
+        {(["available", "morning-only", "night-only", "pending", "full"] as const).map((k) => (
+          <div key={k} className={cn("flex items-center gap-1.5 px-2.5 py-1.5 rounded-md border", statusColors[k].cellBg, statusColors[k].cellBorder)}>
+            <span className={cn("h-2.5 w-2.5 rounded-sm", statusColors[k].dot)} />
+            <span className={cn("font-bold text-[11px]", statusColors[k].dayText)}>{statusColors[k].label}</span>
           </div>
         ))}
       </div>
@@ -86,32 +89,49 @@ export default function CalendarPage() {
             const isOtherMonth = !isSameMonth(d, cursor);
             const isToday = isSameDay(d, new Date());
             const colors = statusColors[info.status];
+            const hasMorning = info.bookings.some((b: any) => b.slot === "morning");
+            const hasNight = info.bookings.some((b: any) => b.slot === "night");
             return (
               <button
                 key={ds}
                 onClick={() => info.status !== "past" && setSelected(ds)}
                 disabled={info.status === "past"}
                 className={cn(
-                  "min-h-[58px] lg:min-h-[80px] rounded-lg p-1 lg:p-2 flex flex-col items-stretch text-left transition-all tap-target border",
-                  isOtherMonth ? "opacity-30 border-transparent" : "border-transparent",
-                  info.status === "past" && "cursor-not-allowed opacity-50",
-                  info.status !== "past" && info.status !== "available" && "border-border/40",
-                  info.status !== "past" && "hover:bg-muted/60",
-                  isToday && "ring-2 ring-primary"
+                  "relative min-h-[64px] lg:min-h-[88px] rounded-lg p-1 lg:p-1.5 flex flex-col items-stretch text-left transition-all tap-target border-2 overflow-hidden",
+                  colors.cellBg,
+                  colors.cellBorder,
+                  isOtherMonth && "opacity-30",
+                  info.status === "past" && "cursor-not-allowed",
+                  info.status !== "past" && "hover:brightness-95 active:scale-[0.97]",
+                  isToday && "ring-2 ring-primary ring-offset-1"
                 )}
               >
-                <div className="flex items-center justify-between gap-0.5">
+                {/* Date */}
+                <div className="flex items-center justify-between">
                   <span className={cn(
-                    "text-[13px] lg:text-sm font-bold",
+                    "text-[13px] lg:text-sm font-bold leading-none",
+                    info.status !== "past" ? colors.dayText : "text-muted-foreground/60",
                     isToday && "h-6 w-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs"
                   )}>{format(d, "d")}</span>
+
+                  {/* Slot icons - quick visual of which slot is booked */}
                   {info.status !== "past" && info.status !== "available" && (
-                    <span className={cn("h-1.5 w-1.5 rounded-full", colors.dot)} />
+                    <div className="flex items-center gap-0.5">
+                      {hasMorning && <Sun className="h-2.5 w-2.5 text-warning" strokeWidth={3} />}
+                      {hasNight && <Moon className="h-2.5 w-2.5 text-info" strokeWidth={3} />}
+                    </div>
                   )}
                 </div>
+
+                {/* Status pill at bottom */}
                 {info.status !== "past" && info.status !== "available" && (
-                  <div className={cn("mt-auto text-[8px] lg:text-[10px] font-bold rounded-md px-0.5 py-0.5 text-center leading-tight", colors.chip)}>
-                    {colors.label}
+                  <div className={cn("mt-auto text-[8px] lg:text-[10px] font-bold rounded px-1 py-0.5 text-center leading-tight uppercase tracking-wider", colors.chip)}>
+                    {colors.shortLabel}
+                  </div>
+                )}
+                {info.status === "available" && !isOtherMonth && (
+                  <div className="mt-auto text-[8px] lg:text-[10px] font-bold text-success/70 text-center uppercase tracking-wider">
+                    Free
                   </div>
                 )}
               </button>
