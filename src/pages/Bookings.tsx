@@ -179,10 +179,17 @@ export default function Bookings() {
           const SourceIcon = b.source === "online" ? Globe : Store;
 
           return (
-            <div key={b.id} className="rounded-md bg-card border border-border shadow-[var(--shadow-sm)] overflow-hidden">
+            <div key={b.id} className={cn(
+              "rounded-md bg-card border-2 shadow-[var(--shadow-sm)] overflow-hidden transition-all",
+              b.status === "pending" && "border-warning/60 ring-1 ring-warning/20 bg-warning-soft/30",
+              b.status === "confirmed" && "border-success/60 ring-1 ring-success/20 bg-success-soft/20",
+              b.status === "rejected" && "border-destructive/40 opacity-80",
+              b.status === "completed" && "border-info/30",
+              !["pending","confirmed","rejected","completed"].includes(b.status) && "border-border",
+            )}>
               <Link to={`/bookings/${b.id}`} className="flex hover:bg-muted/30 transition-colors">
                 {/* Left status bar */}
-                <div className={cn("w-1 shrink-0", cfg.bar)} />
+                <div className={cn("w-1.5 shrink-0", cfg.bar)} />
 
                 {/* Date block */}
                 <div className="w-16 shrink-0 flex flex-col items-center justify-center py-3 border-r border-border bg-muted/20">

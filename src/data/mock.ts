@@ -31,6 +31,8 @@ export interface Booking {
   createdAt: string;
   notes?: string;
   payments?: PaymentEntry[];
+  guests?: number;
+  functionType?: string;
 }
 
 export interface Hall {
@@ -56,7 +58,11 @@ export interface Hall {
   morningSlotTime?: string;
   nightSlotTime?: string;
   policies?: string[];
+  hallType?: string;
+  supportNumber?: string;
 }
+
+export const HALL_TYPES = ["Wedding Hall", "Lawn", "Banquet Hall", "Convention Center", "Marriage Garden"];
 
 export const DEFAULT_POLICIES = [
   "Guests must arrive on time as per booking slot",
@@ -119,6 +125,8 @@ export const halls: Hall[] = [
       "Night bookings must vacate the hall by 9:00 AM next morning",
       "Loud music allowed only till 10:00 PM",
     ],
+    hallType: "Wedding Hall",
+    supportNumber: "+919876500001",
   },
   {
     id: "h2",
@@ -146,6 +154,8 @@ export const halls: Hall[] = [
       "Do not waste food",
       "Vacate promptly after night booking",
     ],
+    hallType: "Lawn",
+    supportNumber: "+919876500002",
   },
 ];
 

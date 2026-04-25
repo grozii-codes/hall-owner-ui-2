@@ -1,5 +1,6 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { bookings, formatINR, type PaymentEntry, type PaymentMethod } from "@/data/mock";
+import { bookings, halls, formatINR, type PaymentEntry, type PaymentMethod } from "@/data/mock";
+import { generateBookingConfirmationPdf } from "@/lib/bookingPdf";
 import { ArrowLeft, Phone, MessageCircle, MapPin, Calendar, FileDown, CheckCircle2, XCircle, Building2, User, Hash, Plus, Banknote, Smartphone, CreditCard, Landmark, FileText, Trash2, Globe, Store, Ban, Receipt } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -69,7 +70,13 @@ export default function BookingDetail() {
   const handleConfirm = () => {
     b.status = "confirmed";
     refresh();
-    toast.success("Booking confirmed", { description: `${b.customerName} has been notified.` });
+    try {
+      const hall = halls.find((h) => h.id === b.hallId);
+      generateBookingConfirmationPdf(b, hall);
+      toast.success("Booking confirmed", { description: "Confirmation PDF downloaded." });
+    } catch {
+      toast.success("Booking confirmed", { description: `${b.customerName} has been notified.` });
+    }
   };
   const handleReject = () => {
     b.status = "rejected";
@@ -388,6 +395,15 @@ export default function BookingDetail() {
             <Button onClick={shareWA} variant="outline" className="h-11 rounded-xl font-semibold tap-target">
               <FileDown className="h-4 w-4 mr-1.5" /> Share Receipt
             </Button>
+            {(b.status === "confirmed" || b.status === "completed" || b.status === "offline") && (
+              <Button
+                onClick={() => { generateBookingConfirmationPdf(b, halls.find((h) => h.id === b.hallId)); toast.success("PDF downloaded"); }}
+                variant="outline"
+                className="h-11 rounded-xl font-semibold tap-target"
+              >
+                <FileDown className="h-4 w-4 mr-1.5" /> Download PDF
+              </Button>
+            )}
             {b.status === "confirmed" && (
               <Button onClick={handleMarkCompleted} variant="outline" className="h-11 rounded-xl border-info text-info hover:bg-info-soft font-semibold tap-target">
                 <CheckCircle2 className="h-4 w-4 mr-1.5" /> Mark Completed

@@ -138,6 +138,15 @@ export default function AppLayout() {
                 <Bell className="h-[19px] w-[19px]" />
                 <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-accent ring-2 ring-background" />
               </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="lg:hidden rounded-lg tap-target h-10 w-10 text-destructive"
+                onClick={logout}
+                aria-label="Sign out"
+              >
+                <LogOut className="h-[18px] w-[18px]" />
+              </Button>
             </div>
           </div>
         </header>
