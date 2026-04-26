@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { cn } from "@/lib/utils";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -15,26 +14,20 @@ export default function Login() {
   const [dob, setDob] = useState("");
   const [mobile, setMobile] = useState("");
 
-  const handleHallId = (v: string) => {
-    const digits = v.replace(/\D/g, "").slice(0, 8);
-    setHallId(digits);
-  };
+  const handleHallId = (v: string) => setHallId(v.replace(/\D/g, "").slice(0, 8));
 
   const handlePin = (i: number, v: string) => {
     const d = v.replace(/\D/g, "").slice(-1);
     const next = [...pin];
     next[i] = d;
     setPin(next);
-    if (d && i < 3) {
-      const el = document.getElementById(`pin-${i + 1}`);
-      el?.focus();
-    }
+    if (d && i < 3) document.getElementById(`pin-${i + 1}`)?.focus();
   };
 
   const submitLogin = () => {
     if (hallId.length !== 8) return toast.error("Enter your 8-digit Hall ID");
     if (pin.join("").length !== 4) return toast.error("Enter your 4-digit PIN");
-    toast.success("Welcome back, Kareem Owner");
+    toast.success("Welcome back");
     localStorage.setItem("bmh_owner_session", "1");
     navigate("/");
   };
@@ -42,56 +35,52 @@ export default function Login() {
   const submitForgot = () => {
     if (!dob) return toast.error("Date of birth required");
     if (mobile.replace(/\D/g, "").length < 10) return toast.error("Enter a valid mobile number");
-    toast.success("Reset link sent on your mobile via SMS");
+    toast.success("Reset link sent via SMS");
     setView("login");
   };
 
   return (
-    <div className="min-h-screen bg-gradient-hero flex flex-col">
-      {/* Top brand */}
-      <div className="px-6 pt-10 pb-6 text-center">
-        <div className="inline-flex items-center gap-2.5 mb-3">
-          <div className="h-11 w-11 rounded-xl bg-accent flex items-center justify-center shadow-lg">
-            <Building2 className="h-6 w-6 text-accent-foreground" />
+    <div className="min-h-screen bg-muted/30 flex flex-col">
+      <header className="bg-primary text-primary-foreground px-6 py-5 border-b border-primary/30">
+        <div className="max-w-sm mx-auto flex items-center gap-2.5">
+          <div className="h-9 w-9 rounded-md bg-accent flex items-center justify-center">
+            <Building2 className="h-5 w-5 text-accent-foreground" />
           </div>
-          <span className="font-serif-display text-2xl font-bold text-primary-foreground">BookMyHall</span>
+          <div>
+            <div className="font-serif-display font-bold text-lg leading-none">BookMyHall</div>
+            <div className="text-[10px] uppercase tracking-[0.2em] text-primary-foreground/70 font-bold mt-1">Owner Console</div>
+          </div>
         </div>
-        <p className="text-xs uppercase tracking-[0.2em] text-primary-foreground/70 font-semibold">Owner Console</p>
-      </div>
+      </header>
 
-      {/* Card */}
-      <div className="flex-1 bg-background rounded-t-[2rem] px-6 pt-8 pb-10 shadow-2xl">
-        <div className="max-w-sm mx-auto">
+      <main className="flex-1 px-6 py-8">
+        <div className="max-w-sm mx-auto bg-card border border-border rounded-md shadow-[var(--shadow-card)] p-6">
           {view === "login" ? (
             <>
-              <h1 className="font-serif-display text-3xl font-bold mb-1">Welcome back</h1>
-              <p className="text-sm text-muted-foreground mb-7">
-                Sign in with the Hall ID and PIN provided by BookMyHall admin.
+              <h1 className="font-serif-display text-2xl font-bold mb-1">Sign in</h1>
+              <p className="text-sm text-muted-foreground mb-6">
+                Use the Hall ID and PIN issued by your BookMyHall admin.
               </p>
 
-              <div className="space-y-5">
+              <div className="space-y-4">
                 <div>
-                  <Label className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground">
-                    Hall ID (8 digits)
-                  </Label>
+                  <Label className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground">Hall ID (8 digits)</Label>
                   <div className="relative mt-1.5">
-                    <KeyRound className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
                       inputMode="numeric"
                       value={hallId}
                       onChange={(e) => handleHallId(e.target.value)}
-                      placeholder="e.g. 10024578"
-                      className="h-13 pl-10 rounded-xl text-base font-mono tracking-widest"
+                      placeholder="10024578"
+                      className="h-11 pl-9 rounded-md text-base font-mono tracking-[0.2em]"
                       maxLength={8}
                     />
                   </div>
                 </div>
 
                 <div>
-                  <Label className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground">
-                    4-Digit PIN
-                  </Label>
-                  <div className="flex gap-2.5 mt-1.5">
+                  <Label className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground">4-digit PIN</Label>
+                  <div className="flex gap-2 mt-1.5">
                     {pin.map((v, i) => (
                       <input
                         key={i}
@@ -105,17 +94,14 @@ export default function Login() {
                             document.getElementById(`pin-${i - 1}`)?.focus();
                           }
                         }}
-                        className="h-14 w-full text-center text-2xl font-bold rounded-xl border-2 border-border bg-card focus:border-primary focus:outline-none"
+                        className="h-12 w-full text-center text-xl font-bold rounded-md border border-border bg-card focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
                       />
                     ))}
                   </div>
                 </div>
 
-                <Button
-                  onClick={submitLogin}
-                  className="w-full h-13 rounded-xl text-base font-semibold bg-primary hover:bg-primary-glow shadow-glow"
-                >
-                  <Lock className="h-4 w-4 mr-2" /> Sign In
+                <Button onClick={submitLogin} className="w-full h-11 rounded-md text-sm font-semibold bg-primary hover:bg-primary-glow">
+                  <Lock className="h-4 w-4 mr-1.5" /> Sign in
                 </Button>
 
                 <button
@@ -126,64 +112,49 @@ export default function Login() {
                 </button>
               </div>
 
-              <div className="mt-10 rounded-xl bg-muted/60 p-4 text-xs text-muted-foreground leading-relaxed">
-                <span className="font-semibold text-foreground">New here?</span> Contact your BookMyHall admin to receive your Hall ID and PIN. We onboard halls personally to keep your account safe.
+              <div className="mt-6 rounded-md border border-border bg-muted/40 p-3 text-xs text-muted-foreground leading-relaxed">
+                <span className="font-semibold text-foreground">New here?</span> Contact your BookMyHall admin to receive your Hall ID and PIN. Each account is verified personally before activation.
               </div>
             </>
           ) : (
             <>
-              <button onClick={() => setView("login")} className="flex items-center gap-1.5 text-sm font-semibold text-muted-foreground mb-4">
-                <ArrowLeft className="h-4 w-4" /> Back to Sign In
+              <button onClick={() => setView("login")} className="flex items-center gap-1.5 text-sm font-semibold text-muted-foreground mb-3 hover:text-foreground">
+                <ArrowLeft className="h-4 w-4" /> Back to sign in
               </button>
-              <h1 className="font-serif-display text-3xl font-bold mb-1">Reset PIN</h1>
-              <p className="text-sm text-muted-foreground mb-7">
-                Verify your identity with your registered date of birth and mobile number.
+              <h1 className="font-serif-display text-2xl font-bold mb-1">Reset PIN</h1>
+              <p className="text-sm text-muted-foreground mb-6">
+                Verify with your registered date of birth and mobile number.
               </p>
 
-              <div className="space-y-5">
+              <div className="space-y-4">
                 <div>
-                  <Label className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground">
-                    Date of Birth
-                  </Label>
+                  <Label className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground">Date of birth</Label>
                   <div className="relative mt-1.5">
-                    <CalIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-                    <Input
-                      type="date"
-                      value={dob}
-                      onChange={(e) => setDob(e.target.value)}
-                      className="h-13 pl-10 rounded-xl text-base"
-                    />
+                    <CalIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                    <Input type="date" value={dob} onChange={(e) => setDob(e.target.value)} className="h-11 pl-9 rounded-md text-sm" />
                   </div>
                 </div>
 
                 <div>
-                  <Label className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground">
-                    Registered Mobile Number
-                  </Label>
+                  <Label className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground">Registered mobile</Label>
                   <div className="relative mt-1.5">
-                    <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      inputMode="numeric"
-                      value={mobile}
-                      onChange={(e) => setMobile(e.target.value)}
-                      placeholder="+91 xxxxx xxxxx"
-                      className="h-13 pl-10 rounded-xl text-base"
-                    />
+                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input inputMode="numeric" value={mobile} onChange={(e) => setMobile(e.target.value)} placeholder="+91 xxxxx xxxxx" className="h-11 pl-9 rounded-md text-sm" />
                   </div>
                 </div>
 
-                <Button onClick={submitForgot} className="w-full h-13 rounded-xl text-base font-semibold bg-primary hover:bg-primary-glow">
-                  Send Reset SMS
+                <Button onClick={submitForgot} className="w-full h-11 rounded-md text-sm font-semibold bg-primary hover:bg-primary-glow">
+                  Send reset SMS
                 </Button>
               </div>
             </>
           )}
-
-          <p className="mt-10 text-center text-[11px] text-muted-foreground">
-            Service provided by <span className="font-semibold text-foreground">BookMyHall</span>
-          </p>
         </div>
-      </div>
+
+        <p className="mt-6 text-center text-[11px] text-muted-foreground">
+          Service provided by <span className="font-semibold text-foreground">BookMyHall</span>
+        </p>
+      </main>
     </div>
   );
 }
