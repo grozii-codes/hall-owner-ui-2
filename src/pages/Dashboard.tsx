@@ -55,37 +55,34 @@ export default function Dashboard() {
   const handleAccept = (id: string) => toast.success(`Booking #${id} confirmed`);
   const handleReject = (id: string) => toast.error(`Booking #${id} rejected`);
 
-  return (
-    <div className="px-4 lg:px-8 py-5 lg:py-6 max-w-7xl mx-auto space-y-5">
-      {/* Greeting */}
-      <div className="flex items-end justify-between gap-3">
-        <div className="min-w-0">
-          <p className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Welcome back</p>
-          <h2 className="font-display font-bold text-xl lg:text-2xl mt-1">Kareem Owner</h2>
-        </div>
-        <div className="text-right shrink-0">
-          <p className="text-[11px] text-muted-foreground">{format(new Date(), "EEEE")}</p>
-          <p className="text-sm font-semibold">{format(new Date(), "d MMM yyyy")}</p>
-        </div>
-      </div>
+  const hour = new Date().getHours();
+  const greet = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
 
-      {/* Date range filter */}
-      <div className="rounded-xl bg-card border border-border p-3 shadow-[var(--shadow-card)]">
-        <div className="flex items-center justify-between mb-2.5">
-          <div className="flex items-center gap-2">
-            <CalIcon className="h-4 w-4 text-primary" />
-            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Period</span>
-            <span className="text-sm font-semibold">{label}</span>
+  return (
+    <div className="px-4 lg:px-8 py-5 lg:py-6 max-w-7xl mx-auto space-y-4">
+      {/* Greeting + inline period switcher */}
+      <div className="space-y-3">
+        <div className="flex items-end justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground font-semibold">{greet}</p>
+            <h2 className="font-display font-bold text-2xl lg:text-3xl mt-0.5">Kareem</h2>
+          </div>
+          <div className="text-right shrink-0">
+            <p className="text-[11px] text-muted-foreground">{format(new Date(), "EEEE")}</p>
+            <p className="text-sm font-semibold">{format(new Date(), "d MMM yyyy")}</p>
           </div>
         </div>
-        <div className="flex gap-1.5 overflow-x-auto scrollbar-hide">
+
+        <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-hide -mx-1 px-1">
           {ranges.map((r) => (
             <button
               key={r.id}
               onClick={() => setRange(r.id)}
               className={cn(
-                "shrink-0 px-3.5 h-8 rounded-md text-xs font-semibold tap-target transition-colors",
-                range === r.id ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:text-foreground"
+                "shrink-0 px-3 h-8 rounded-full text-xs font-semibold tap-target transition-colors border",
+                range === r.id
+                  ? "bg-primary text-primary-foreground border-primary"
+                  : "bg-card text-muted-foreground border-border hover:text-foreground"
               )}
             >
               {r.label}
@@ -96,47 +93,40 @@ export default function Dashboard() {
               type="date"
               value={customDate}
               onChange={(e) => setCustomDate(e.target.value)}
-              className="shrink-0 h-8 rounded-md bg-muted border-0 px-2.5 text-xs font-semibold"
+              className="shrink-0 h-8 rounded-full bg-card border border-border px-3 text-xs font-semibold"
             />
           )}
+          <span className="shrink-0 ml-auto text-[11px] text-muted-foreground font-medium pl-2">{label}</span>
         </div>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <div className="stat-card">
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] uppercase tracking-wide text-muted-foreground font-semibold">Revenue</span>
-            <IndianRupee className="h-4 w-4 text-primary" />
-          </div>
-          <div className="text-xl lg:text-2xl font-display font-bold mt-2">{formatINR(revenue)}</div>
-          <div className="text-[11px] text-success font-semibold mt-0.5 flex items-center gap-1">
-            <TrendingUp className="h-3 w-3" /> {filtered.length} bookings
-          </div>
+      {/* Stats — clean, scannable */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5">
+        <div className="rounded-lg bg-card border border-border p-3.5 shadow-[var(--shadow-card)]">
+          <div className="text-[10px] uppercase tracking-wide text-muted-foreground font-bold">Revenue</div>
+          <div className="text-2xl font-display font-bold mt-1.5 tabular-nums">{formatINR(revenue)}</div>
+          <div className="text-[11px] text-muted-foreground mt-0.5">{filtered.length} bookings</div>
         </div>
-        <div className="stat-card">
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] uppercase tracking-wide text-muted-foreground font-semibold">Confirmed</span>
-            <Check className="h-4 w-4 text-success" />
-          </div>
-          <div className="text-xl lg:text-2xl font-display font-bold mt-2">{confirmedCount}</div>
-          <div className="text-[11px] text-muted-foreground mt-0.5">In selected period</div>
+        <div className="rounded-lg bg-card border border-border p-3.5 shadow-[var(--shadow-card)]">
+          <div className="text-[10px] uppercase tracking-wide text-muted-foreground font-bold">Confirmed</div>
+          <div className="text-2xl font-display font-bold mt-1.5 text-success tabular-nums">{confirmedCount}</div>
+          <div className="text-[11px] text-muted-foreground mt-0.5">In this period</div>
         </div>
-        <div className="stat-card">
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] uppercase tracking-wide text-muted-foreground font-semibold">Pending</span>
-            <span className="h-2 w-2 rounded-full bg-warning animate-pulse" />
+        <div className={cn(
+          "rounded-lg border p-3.5 shadow-[var(--shadow-card)]",
+          pending.length > 0 ? "bg-warning-soft/50 border-warning/40" : "bg-card border-border"
+        )}>
+          <div className="text-[10px] uppercase tracking-wide font-bold flex items-center gap-1.5">
+            <span className={cn("text-muted-foreground")}>Pending</span>
+            {pending.length > 0 && <span className="h-1.5 w-1.5 rounded-full bg-warning animate-pulse" />}
           </div>
-          <div className="text-xl lg:text-2xl font-display font-bold mt-2">{pending.length}</div>
-          <div className="text-[11px] text-warning font-semibold mt-0.5">Need action</div>
+          <div className={cn("text-2xl font-display font-bold mt-1.5 tabular-nums", pending.length > 0 ? "text-warning" : "")}>{pending.length}</div>
+          <div className="text-[11px] text-muted-foreground mt-0.5">{pending.length > 0 ? "Tap to act" : "All clear"}</div>
         </div>
-        <div className="stat-card">
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] uppercase tracking-wide text-muted-foreground font-semibold">Active Halls</span>
-            <Building2 className="h-4 w-4 text-primary" />
-          </div>
-          <div className="text-xl lg:text-2xl font-display font-bold mt-2">{activeHalls}</div>
-          <div className="text-[11px] text-muted-foreground mt-0.5">of {halls.length} total</div>
+        <div className="rounded-lg bg-card border border-border p-3.5 shadow-[var(--shadow-card)]">
+          <div className="text-[10px] uppercase tracking-wide text-muted-foreground font-bold">Halls Live</div>
+          <div className="text-2xl font-display font-bold mt-1.5 tabular-nums">{activeHalls}<span className="text-base text-muted-foreground font-normal">/{halls.length}</span></div>
+          <div className="text-[11px] text-muted-foreground mt-0.5">Active listings</div>
         </div>
       </div>
 
