@@ -24,13 +24,14 @@ const sources: { id: Source; label: string; icon: typeof Globe | typeof Store | 
   { id: "offline", label: "Offline", icon: Store },
 ];
 
-const statusConfig: Record<string, { label: string; row: string; badge: string; dot: string; bar: string }> = {
+const statusConfig: Record<string, { label: string; row: string; badge: string; dot: string; bar: string; borderBar: string }> = {
   pending: {
     label: "Need action",
     row: "border-warning/60 bg-warning-soft/35",
     badge: "bg-warning-soft text-warning border-warning/35",
     dot: "bg-warning",
     bar: "bg-warning",
+    borderBar: "border-l-warning",
   },
   confirmed: {
     label: "Confirmed",
@@ -38,6 +39,7 @@ const statusConfig: Record<string, { label: string; row: string; badge: string; 
     badge: "bg-success-soft text-success border-success/30",
     dot: "bg-success",
     bar: "bg-success",
+    borderBar: "border-l-success",
   },
   completed: {
     label: "Done",
@@ -45,6 +47,7 @@ const statusConfig: Record<string, { label: string; row: string; badge: string; 
     badge: "bg-info-soft text-info border-info/25",
     dot: "bg-info",
     bar: "bg-info",
+    borderBar: "border-l-info",
   },
   rejected: {
     label: "Rejected",
@@ -52,6 +55,7 @@ const statusConfig: Record<string, { label: string; row: string; badge: string; 
     badge: "bg-destructive-soft text-destructive border-destructive/30",
     dot: "bg-destructive",
     bar: "bg-destructive",
+    borderBar: "border-l-destructive",
   },
   offline: {
     label: "Offline entry",
@@ -59,6 +63,7 @@ const statusConfig: Record<string, { label: string; row: string; badge: string; 
     badge: "bg-muted text-muted-foreground border-border",
     dot: "bg-muted-foreground",
     bar: "bg-muted-foreground",
+    borderBar: "border-l-muted-foreground",
   },
   cancelled: {
     label: "Cancelled",
@@ -66,6 +71,7 @@ const statusConfig: Record<string, { label: string; row: string; badge: string; 
     badge: "bg-destructive-soft text-destructive border-destructive/30",
     dot: "bg-destructive",
     bar: "bg-destructive",
+    borderBar: "border-l-destructive",
   },
 };
 
