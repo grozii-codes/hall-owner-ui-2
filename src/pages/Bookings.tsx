@@ -286,7 +286,7 @@ export default function Bookings() {
             const SourceIcon = b.source === "online" ? Globe : Store;
 
             return (
-              <div key={b.id} className={cn("relative grid grid-cols-[92px_1.25fr_1fr_120px_145px_132px] gap-4 px-4 py-3 items-center border-l-4", cfg.row, cfg.bar.replace("bg-", "border-l-"))}>
+              <div key={b.id} className={cn("relative grid grid-cols-[92px_1.25fr_1fr_120px_145px_132px] gap-4 px-4 py-3 items-center border-l-4", cfg.row, cfg.borderBar)}>
                 <Link to={`/bookings/${b.id}`} className="absolute inset-0" aria-label={`Open booking ${b.id}`} />
                 <div className="relative z-10">
                   <div className="text-[11px] font-bold uppercase text-muted-foreground">{format(dateObj, "MMM")}</div>
